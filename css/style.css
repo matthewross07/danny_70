@@ -1,0 +1,1076 @@
+/* Danny Ross · 70th Birthday Landscape & Field Journal
+ * Tactile sunlit field-atlas aesthetic:
+ * warm cotton/parchment journal cards, deep forest-pine ink, terracotta trail
+ * blazes, mounted archival photo prints on linen mats, and an open golden-hour
+ * 3D horizon that feels like walking across the landscape.
+ */
+
+:root {
+  --sky-deep: #111d2b;
+  --paper: rgba(247, 242, 232, 0.97);
+  --paper-solid: #f7f2e8;
+  --paper-warm: #f1eadb;
+  --mat: #e8dfd0;
+  --ink: #1a261f;
+  --ink-soft: #2f3e35;
+  --sage: #59695e;
+  --faint: #7a877d;
+  --terra: #b85a32;
+  --terra-soft: rgba(184, 90, 50, 0.12);
+  --pine: #1f362b;
+  --pine-hover: #294739;
+  --ochre: #c98a35;
+  --rule: rgba(31, 54, 43, 0.12);
+  --rule-strong: rgba(31, 54, 43, 0.22);
+
+  --serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --shadow-card:
+    0 24px 64px rgba(14, 23, 19, 0.34),
+    0 4px 14px rgba(14, 23, 19, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--sky-deep);
+  color: var(--ink);
+  font: 15px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; cursor: pointer; }
+h1, h2, h3, p, figure { margin: 0; }
+a { color: var(--terra); text-underline-offset: 3px; }
+
+/* ---------- Full-bleed 3D Landscape Stage ---------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(1px 1px at 14% 14%, rgba(255, 248, 234, 0.48), transparent 60%),
+    radial-gradient(1px 1px at 76% 10%, rgba(255, 245, 228, 0.42), transparent 60%),
+    radial-gradient(1.2px 1.2px at 38% 24%, rgba(255, 248, 234, 0.34), transparent 60%),
+    radial-gradient(1px 1px at 88% 28%, rgba(255, 244, 224, 0.32), transparent 60%),
+    radial-gradient(ellipse at 52% 112%, #4a5b68 0%, #24394e 42%, #132131 78%, #0d1723 100%);
+}
+
+.stage .globe-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.globe-canvas .maplibregl-canvas { outline: none; }
+
+.fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    linear-gradient(180deg, rgba(16, 28, 40, 0.28) 0%, rgba(16, 28, 40, 0.04) 16%, transparent 28%),
+    radial-gradient(circle at 50% 50%, transparent 62%, rgba(12, 20, 28, 0.22) 100%);
+}
+
+/* Subtle archival cotton paper grain shared across field-journal cards */
+.hero-card,
+.memory-card,
+.chapter-banner,
+.drawer {
+  background-image:
+    radial-gradient(rgba(31, 54, 43, 0.03) 1px, transparent 0),
+    radial-gradient(rgba(184, 90, 50, 0.022) 1px, transparent 0);
+  background-size: 22px 22px, 31px 31px;
+  background-position: 0 0, 11px 13px;
+}
+
+/* ---------- Loader ---------- */
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  box-shadow: 0 12px 32px rgba(14, 23, 19, 0.25);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.loader.done { opacity: 0; }
+.spinner {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(31, 54, 43, 0.18);
+  border-top-color: var(--terra);
+  animation: spin 0.85s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Topbar / Masthead ---------- */
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: max(18px, env(safe-area-inset-top)) 28px 14px;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.topbar > * { pointer-events: auto; }
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 15px 5px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(247, 242, 232, 0.95);
+  box-shadow: 0 8px 26px rgba(14, 23, 19, 0.2);
+  text-align: left;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.brand:hover {
+  transform: translateY(-1px);
+  background: rgba(250, 246, 238, 0.96);
+}
+
+.brand-emblem {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--pine);
+  background: #ebe3d2;
+  border: 1px solid var(--rule-strong);
+}
+
+.brand-copy { display: flex; flex-direction: column; }
+.brand-kicker {
+  font: 600 9.5px/1.1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--terra);
+}
+.brand-title {
+  font: 600 22px/1.05 var(--serif);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(247, 242, 232, 0.95);
+  box-shadow: 0 8px 24px rgba(14, 23, 19, 0.18);
+  font: 600 13px var(--sans);
+  color: var(--ink);
+  transition: background 0.18s, transform 0.18s;
+}
+.pill-btn:hover {
+  background: #fbf8f1;
+  transform: translateY(-1px);
+}
+.pill-btn.ghost {
+  background: rgba(247, 242, 232, 0.78);
+  color: var(--ink-soft);
+}
+.count-pill {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--pine);
+  color: #f7f2e8;
+  font: 500 11px/1.2 var(--mono);
+}
+
+/* ---------- Cinema Mode ---------- */
+body.cinema-mode .chrome,
+body.cinema-mode .hero-card,
+body.cinema-mode .maplibregl-ctrl-bottom-right {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body.cinema-mode .maplibregl-ctrl-attrib {
+  opacity: 0.25;
+}
+.cinema-exit {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  z-index: 35;
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
+  box-shadow: 0 8px 20px rgba(14, 23, 19, 0.22);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+body.cinema-mode:hover .cinema-exit,
+.cinema-exit:focus-visible {
+  opacity: 0.94;
+}
+
+/* ---------- Opening Field Atlas Cover Card ---------- */
+.eyebrow {
+  font: 600 10.5px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--terra);
+}
+
+.hero-card {
+  position: absolute;
+  left: 32px;
+  bottom: 32px;
+  z-index: 18;
+  width: min(492px, calc(100vw - 64px));
+  padding: 26px 28px 24px;
+  border-radius: 20px;
+  background-color: var(--paper);
+  border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow-card);
+  animation: float-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes float-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-stamp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.topo-badge {
+  font: 500 10.5px/1 var(--mono);
+  letter-spacing: 0.08em;
+  color: var(--sage);
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(31, 54, 43, 0.06);
+}
+
+.hero-card h1 {
+  font: 500 clamp(28px, 3vw, 38px)/1.1 var(--serif);
+  letter-spacing: -0.012em;
+  margin: 12px 0 10px;
+  color: var(--ink);
+}
+.hero-lede {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--pine);
+  color: #f8f4ec;
+  font: 600 14px var(--sans);
+  box-shadow: 0 10px 24px rgba(24, 42, 33, 0.28);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.primary-btn:hover {
+  transform: translateY(-1px);
+  background: var(--pine-hover);
+}
+
+.secondary-btn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(31, 54, 43, 0.04);
+  font: 600 13.5px var(--sans);
+  color: var(--ink);
+  transition: background 0.18s, border-color 0.18s;
+}
+.secondary-btn:hover {
+  background: rgba(31, 54, 43, 0.09);
+  border-color: rgba(31, 54, 43, 0.36);
+}
+
+.hero-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.chap-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.52);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.chap-pill i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c, var(--terra));
+}
+.chap-pill:hover {
+  color: var(--ink);
+  border-color: var(--terra);
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ---------- Chapter Transition Trailhead Sign ---------- */
+.chapter-banner {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+  z-index: 22;
+  text-align: center;
+  pointer-events: none;
+  padding: 12px 28px 14px;
+  border-radius: 999px;
+  background-color: var(--paper);
+  border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.chapter-banner.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(4px);
+}
+.chapter-roman {
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--terra);
+}
+.chapter-name {
+  font: 500 clamp(21px, 2.4vw, 28px)/1.12 var(--serif);
+  font-style: italic;
+  color: var(--ink);
+  margin-top: 3px;
+}
+
+/* ---------- Floating Field Journal Memory Card ---------- */
+.memory-card {
+  position: absolute;
+  right: 30px;
+  top: 52%;
+  transform: translateY(-48%) scale(0.985);
+  z-index: 19;
+  width: min(464px, 39vw);
+  max-height: calc(100vh - 116px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: var(--paper);
+  border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transition: opacity 0.48s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.48s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.memory-card.in {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.mc-header {
+  padding: 18px 24px 13px;
+  flex-shrink: 0;
+}
+.mc-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.mc-chapter {
+  font: 600 10.5px/1.2 var(--sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--terra);
+}
+.mc-step {
+  font: 500 10.5px/1 var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--sage);
+}
+.mc-title {
+  font: 500 clamp(24px, 2.3vw, 31px)/1.1 var(--serif);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.mc-locus {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-top: 6px;
+}
+.mc-place {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.mc-place svg { color: var(--terra); flex: none; }
+.mc-coords {
+  font: 400 10.5px/1.2 var(--mono);
+  letter-spacing: 0.03em;
+  color: var(--sage);
+}
+
+/* Mounted Archival Print Stage on Warm Linen Mat */
+.mc-media {
+  position: relative;
+  margin: 0 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, #f1eadc 0%, #e4dac7 100%);
+  border: 1px solid var(--rule-strong);
+  box-shadow: inset 0 2px 8px rgba(28, 38, 31, 0.07);
+  flex-shrink: 0;
+}
+.mc-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(220px, 31vh, 310px);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.mc-slide {
+  position: absolute;
+  inset: 0;
+  padding: 14px 16px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.mc-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.mc-slide-fg {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: zoom-in;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 3px;
+  box-shadow:
+    0 10px 26px rgba(24, 32, 26, 0.22),
+    0 1px 3px rgba(24, 32, 26, 0.14);
+  transform: scale(0.982);
+  transition: transform 6.5s ease-out;
+}
+.mc-slide.active .mc-slide-fg {
+  transform: scale(1);
+}
+
+.mc-video-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.mc-video-wrap video {
+  max-width: 100%;
+  max-height: 100%;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 4px;
+  box-shadow: 0 10px 26px rgba(24, 32, 26, 0.22);
+}
+.mc-mute-btn {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
+  box-shadow: 0 4px 12px rgba(14, 23, 19, 0.2);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.mc-gallery-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(235, 226, 209, 0.88);
+  border-top: 1px solid var(--rule);
+}
+.mc-nav-arrow {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.mc-nav-arrow:hover {
+  background: #ffffff;
+  border-color: var(--terra);
+  color: var(--terra);
+}
+.mc-dots { display: flex; gap: 6px; align-items: center; }
+.mc-dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(31, 54, 43, 0.24);
+  transition: transform 0.2s, background 0.2s;
+}
+.mc-dot.on {
+  background: var(--terra);
+  transform: scale(1.3);
+}
+.mc-img-count {
+  font: 500 11px/1 var(--mono);
+  color: var(--sage);
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+/* Field Journal Story Body */
+.mc-body {
+  padding: 15px 24px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.mc-body p + p { margin-top: 10px; }
+
+.mc-body.quote-lg {
+  font: 400 21px/1.44 var(--serif);
+  color: var(--ink);
+}
+.mc-body.quote-md {
+  font: 400 18.5px/1.48 var(--serif);
+  color: var(--ink);
+}
+.mc-body.quote-sm {
+  font: 400 15px/1.62 var(--serif);
+  color: var(--ink-soft);
+}
+.memory-card.story-only .mc-header {
+  padding-bottom: 6px;
+}
+.memory-card.story-only .mc-body::before {
+  content: '“';
+  display: block;
+  font: 500 52px/0.68 var(--serif);
+  color: rgba(184, 90, 50, 0.36);
+  margin-bottom: 6px;
+}
+
+/* Terracotta Dwell Progress Thread */
+.mc-progress-track {
+  height: 3px;
+  width: 100%;
+  background: rgba(31, 54, 43, 0.08);
+  flex-shrink: 0;
+}
+.mc-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--terra), var(--ochre));
+  transition: width 0.1s linear;
+}
+
+/* ---------- Terrain Trailpost Flags & Popups ---------- */
+.pin-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  transition: transform 0.28s ease;
+}
+.pin-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 6px;
+  border-radius: 999px;
+  background: rgba(247, 242, 232, 0.92);
+  border: 1px solid rgba(31, 54, 43, 0.28);
+  box-shadow: 0 8px 22px rgba(14, 23, 19, 0.28);
+  white-space: nowrap;
+}
+.pin-flag em {
+  font: 600 10px/1 var(--mono);
+  font-style: normal;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(31, 54, 43, 0.1);
+  color: var(--ink-soft);
+}
+.pin-flag b {
+  font: 600 12.5px/1.1 var(--sans);
+  color: var(--ink);
+}
+.pin-label::after {
+  content: '';
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(180deg, #f7f2e8 0%, rgba(247, 242, 232, 0.25) 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.pin-label.active {
+  transform: translateY(-2px) scale(1.04);
+  z-index: 6;
+}
+.pin-label.active .pin-flag {
+  background: #fbf8f1;
+  border-color: var(--terra);
+  box-shadow: 0 10px 28px rgba(14, 23, 19, 0.34), 0 0 0 3px rgba(184, 90, 50, 0.18);
+}
+.pin-label.active .pin-flag em {
+  background: var(--terra);
+  color: #fffaf2;
+}
+
+.fx-pop .maplibregl-popup-content {
+  padding: 9px 13px;
+  border-radius: 12px;
+  background: var(--paper-solid);
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  box-shadow: 0 12px 30px rgba(14, 23, 19, 0.32);
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+}
+.fx-pop .maplibregl-popup-content b { font: 600 15.5px/1.15 var(--serif); color: var(--ink); }
+.fx-pop .maplibregl-popup-content span { color: var(--sage); }
+.fx-pop .maplibregl-popup-tip {
+  border-top-color: var(--paper-solid) !important;
+  border-bottom-color: var(--paper-solid) !important;
+}
+
+.maplibregl-ctrl-group {
+  background: rgba(247, 242, 232, 0.88) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--rule-strong) !important;
+  box-shadow: 0 8px 22px rgba(14, 23, 19, 0.2) !important;
+}
+.maplibregl-ctrl-group button + button { border-top-color: var(--rule) !important; }
+.maplibregl-ctrl-icon { opacity: 0.78; }
+.maplibregl-ctrl-attrib {
+  background: rgba(247, 242, 232, 0.68) !important;
+  color: var(--sage) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a { color: var(--ink-soft) !important; }
+
+/* ---------- Bottom Trail Transport Bar ---------- */
+.tour-bar {
+  position: absolute;
+  left: 28px;
+  bottom: 24px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow-card);
+  transition: opacity 0.35s ease;
+}
+
+.ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  font: 600 13px var(--sans);
+  color: var(--ink);
+  transition: background 0.15s, color 0.15s;
+}
+.ctrl-btn:hover { background: rgba(31, 54, 43, 0.08); }
+.ctrl-btn.icon-only { width: 36px; padding: 0; }
+.ctrl-btn.play-toggle {
+  background: var(--pine);
+  color: #f8f4ec;
+  padding: 0 16px;
+}
+.ctrl-btn.play-toggle:hover { background: var(--pine-hover); }
+.ctrl-btn.subtle { color: var(--sage); font-weight: 500; font-size: 12.5px; }
+.ctrl-btn.subtle:hover { color: var(--ink); }
+.bar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--rule-strong);
+  margin: 0 2px;
+}
+
+/* ---------- Slide-over Field Notes Drawer ---------- */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(15, 24, 20, 0.42);
+  backdrop-filter: blur(3px);
+  animation: fade 0.22s ease;
+}
+@keyframes fade { from { opacity: 0; } }
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  width: min(484px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--paper-solid);
+  border-left: 1px solid var(--rule-strong);
+  box-shadow: -24px 0 64px rgba(14, 23, 19, 0.34);
+  animation: slide-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes slide-in { from { transform: translateX(100%); } }
+
+.drawer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 24px 14px;
+}
+.drawer-head h2 {
+  font: 500 30px/1.08 var(--serif);
+  color: var(--ink);
+  margin-top: 4px;
+}
+.icon-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+}
+.icon-close:hover { background: #ffffff; border-color: var(--terra); }
+
+.drawer-controls {
+  padding: 0 24px 14px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  gap: 10px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid var(--rule-strong);
+  color: var(--sage);
+}
+.search-box:focus-within { border-color: var(--terra); background: #ffffff; color: var(--ink); }
+.search-box input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.filter-chips::-webkit-scrollbar { display: none; }
+.f-chip {
+  flex: none;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.52);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.f-chip.on {
+  background: var(--pine);
+  border-color: var(--pine);
+  color: #f8f4ec;
+}
+
+.drawer-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 18px 24px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.drawer-chap-heading {
+  font: 600 10.5px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--terra);
+  padding: 12px 6px 4px;
+}
+.mem-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.55);
+  text-align: left;
+  transition: background 0.16s, border-color 0.16s, transform 0.16s;
+}
+.mem-row:hover, .mem-row.active {
+  background: #ffffff;
+  border-color: var(--terra);
+  transform: translateY(-1px);
+}
+.mem-row-place {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--sage);
+}
+.mem-row-num {
+  font: 600 10px/1 var(--mono);
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--terra-soft);
+  color: var(--terra);
+}
+.mem-row-title { font: 500 18.5px/1.16 var(--serif); margin: 3px 0 4px; color: var(--ink); }
+.mem-row-snip {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mem-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #ffffff;
+  padding: 3px;
+  box-shadow: 0 3px 10px rgba(14, 23, 19, 0.16);
+}
+
+.drawer-foot {
+  padding: 12px 24px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+  color: var(--sage);
+}
+
+/* ---------- Archival Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(22, 30, 26, 0.88);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px;
+  animation: fade 0.2s ease;
+}
+.lightbox-frame {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+}
+.lightbox img {
+  display: block;
+  max-width: min(88vw, 1240px);
+  max-height: 78vh;
+  object-fit: contain;
+}
+.lightbox-caption {
+  margin-top: 14px;
+  font: 500 18px var(--serif);
+  color: #f7f2e8;
+  text-align: center;
+}
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--paper);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Responsive Mobile Layout ---------- */
+@media (max-width: 900px) {
+  .topbar { padding: max(14px, env(safe-area-inset-top)) 14px 10px; }
+  .brand-title { font-size: 20px; }
+  .pill-btn span { display: none; }
+  .pill-btn { padding: 0 11px; }
+
+  .hero-card {
+    left: 14px;
+    right: 14px;
+    bottom: 18px;
+    width: auto;
+    padding: 20px 18px;
+  }
+  .hero-chapters { display: none; }
+
+  .memory-card {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 72px;
+    width: auto;
+    max-height: 55svh;
+    transform: translateY(14px);
+  }
+  .memory-card.in {
+    transform: translateY(0);
+  }
+  .mc-header { padding: 14px 18px 10px; }
+  .mc-title { font-size: 22px; }
+  .mc-coords { display: none; }
+  .mc-stage { height: clamp(160px, 23svh, 215px); }
+  .mc-body { padding: 12px 18px 16px; }
+  .mc-body.quote-lg { font-size: 18px; }
+  .mc-body.quote-md { font-size: 16.5px; }
+
+  .tour-bar {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}

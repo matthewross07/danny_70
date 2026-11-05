@@ -1,0 +1,1083 @@
+{
+  "person": "Danny Ross",
+  "occasion": "70th Birthday",
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/12sDwVj_WVe_L3MBfgASWkneV4Kh1bYLxa-G3KWS6L9M/edit",
+  "updatedAt": "2026-11-05T19:37:15Z",
+  "chapters": [
+    {
+      "id": "roots",
+      "roman": "I",
+      "name": "Roots & Rebel Years",
+      "color": "#c96a3b"
+    },
+    {
+      "id": "debbie",
+      "roman": "II",
+      "name": "Debbie & Early Journeys",
+      "color": "#d48c46"
+    },
+    {
+      "id": "front-range",
+      "roman": "III",
+      "name": "Colorado Home Base",
+      "color": "#5c8a6e"
+    },
+    {
+      "id": "high-country",
+      "roman": "IV",
+      "name": "High Country & Campfires",
+      "color": "#3f7a5c"
+    },
+    {
+      "id": "far-horizons",
+      "roman": "V",
+      "name": "Far Horizons",
+      "color": "#4b7fa8"
+    },
+    {
+      "id": "seventy",
+      "roman": "VI",
+      "name": "Turning Seventy",
+      "color": "#d99b38"
+    }
+  ],
+  "memories": [
+    {
+      "id": "m26",
+      "row": 26,
+      "submittedAt": "11/4/2026 15:00:01",
+      "text": "Dan was about 4 or 5 years old.  We were all at a family reunion in Pennsylvania.  Danny is seated all the way to the left right below Mom.",
+      "rawLocation": "Aunt Elsie’s and Uncle Duane’s farm near Latrobe , PA",
+      "order": 1,
+      "chapter": "roots",
+      "title": "Aunt Elsie & Uncle Duane’s Farm",
+      "place": "Near Latrobe, Pennsylvania",
+      "coords": [
+        -79.384,
+        40.3173
+      ],
+      "zoom": 13.9,
+      "pitch": 73,
+      "bearing": 122,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m26_01.jpg",
+          "width": 1600,
+          "height": 1142
+        }
+      ],
+      "elevM": 311,
+      "elevFt": 1020
+    },
+    {
+      "id": "m30",
+      "row": 30,
+      "submittedAt": "11/4/2026 17:29:36",
+      "text": "Many childhood memories, although a bit foggy, of Danny as we competed in sports like YMCA Baseball and Kids Inc football in our early years in Amarillo. In fact, we competed against each other all the way through high school. Danny has always been a great athlete and a great storyteller. One of the stories he loves to tell is about a hanging curve ball he threw over the middle of the plate in the Amarillo High/ Tascosa game our junior year. It’s one of the few times I took advantage of him and hit an opposite field triple earning a couple of RBI’s to help our team (AHS) clinch a win.  \n\nThere are numerous stories around escapades with Ross, Watson and Buckley that shall be forever fondly remembered but rarely shared to protect the innocent.",
+      "rawLocation": "Football and baseball fields all over Amarillo.",
+      "order": 2,
+      "chapter": "roots",
+      "title": "Ballfields of Amarillo",
+      "place": "Amarillo, Texas",
+      "coords": [
+        -101.9044,
+        35.166
+      ],
+      "zoom": 14.8,
+      "pitch": 71,
+      "bearing": 28,
+      "media": [],
+      "elevM": 1130,
+      "elevFt": 3707
+    },
+    {
+      "id": "m24",
+      "row": 24,
+      "submittedAt": "11/4/2026 14:52:29",
+      "text": "Dan was quarterback for Tascosa Rebels from ‘73, ‘74 and 75’.  He threw the longest touchdown pass on record.  I believe it was to James Mayberry!",
+      "rawLocation": "Amarillo, TX",
+      "order": 3,
+      "chapter": "roots",
+      "title": "Record Pass for the Tascosa Rebels",
+      "place": "Dick Bivins Stadium · Amarillo, TX",
+      "coords": [
+        -101.801,
+        35.2032
+      ],
+      "zoom": 15.8,
+      "pitch": 72,
+      "bearing": -26,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m24_01.jpg",
+          "width": 1206,
+          "height": 1850
+        }
+      ],
+      "elevM": 1111,
+      "elevFt": 3645
+    },
+    {
+      "id": "m27",
+      "row": 27,
+      "submittedAt": "11/4/2026 15:07:28",
+      "text": "Quarterback Danny Ross, with his best bud, Running Back James Mayberry. James was inducted into the THS Rebel Hall of Fame and the Panhandle Sports Hall of Fame",
+      "rawLocation": "Tascosa High School Amarillo, Tx",
+      "order": 4,
+      "chapter": "roots",
+      "title": "Quarterback & Running Back",
+      "place": "Tascosa High School · Amarillo, TX",
+      "coords": [
+        -101.8792,
+        35.1938
+      ],
+      "zoom": 15.6,
+      "pitch": 72,
+      "bearing": 22,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m27_01.jpg",
+          "width": 1206,
+          "height": 1600
+        }
+      ],
+      "elevM": 1111,
+      "elevFt": 3645
+    },
+    {
+      "id": "m02",
+      "row": 2,
+      "submittedAt": "11/3/2026 9:43:12",
+      "text": "When I was a freshman at Tascosa High School and starting JV quarterback, I recall wanting to fill the large shoes you left behind as one of the all-time great Rebel qb’s. Of course, filling your shoes made sense to me, since I knew I could never fit into those all-too-tiny, skin-tight, blood-clotting short shorts you wore so divulgenly well.",
+      "rawLocation": "Tascosa High School",
+      "order": 5,
+      "chapter": "roots",
+      "title": "Big Rebel Shoes to Fill",
+      "place": "Tascosa High School · Amarillo, TX",
+      "coords": [
+        -101.8809,
+        35.1946
+      ],
+      "zoom": 15.5,
+      "pitch": 72,
+      "bearing": 74,
+      "media": [],
+      "elevM": 1113,
+      "elevFt": 3652
+    },
+    {
+      "id": "m01",
+      "row": 1,
+      "submittedAt": "11/2/2026 7:09:28",
+      "text": "1. Camping with me, Debbie, Danny and Taylor as a 2 year old! They let me come with them. Such a sweet memory. I was around 14 years old and we ‘showered’ with a bucket of cold water hanging from a tree! It was so much fun. \n2. Going on big walks with Uncle Danny around his neighborhood and even Amarillo at Fleetwood Park talking about all the things of life… I appreciate how much time he has invested in me as his niece - all the love and laughs!\n3. He gave Elli her first haircut 😂 But then he saved the lock of hair for me!",
+      "rawLocation": "",
+      "order": 6,
+      "chapter": "roots",
+      "title": "Campfire Showers & Fleetwood Walks",
+      "place": "Fleetwood · Amarillo, TX",
+      "coords": [
+        -101.8784,
+        35.1737
+      ],
+      "zoom": 14.8,
+      "pitch": 71,
+      "bearing": -22,
+      "media": [],
+      "elevM": 1115,
+      "elevFt": 3658
+    },
+    {
+      "id": "m25",
+      "row": 25,
+      "submittedAt": "11/4/2026 14:54:12",
+      "text": "The night Danny asked his beloved wife, Debbie to marry him!  They are admiring her ring.",
+      "rawLocation": "Jeanne and David’s house Amarillo Tx",
+      "order": 7,
+      "chapter": "debbie",
+      "title": "The Night He Asked Debbie",
+      "place": "Jeanne & David’s Home · Amarillo, TX",
+      "coords": [
+        -101.8625,
+        35.1845
+      ],
+      "zoom": 14.8,
+      "pitch": 71,
+      "bearing": 35,
+      "media": [],
+      "elevM": 1108,
+      "elevFt": 3635
+    },
+    {
+      "id": "m20",
+      "row": 20,
+      "submittedAt": "11/4/2026 10:09:52",
+      "text": "We drove my Datsun B2-10 to Tucumcari NM after our wedding and joining the wedding party at Rhett Butlers",
+      "rawLocation": "https://maps.app.goo.gl/RgUFktTWAm5UyaDj6?g_st=ic",
+      "order": 8,
+      "chapter": "debbie",
+      "title": "Wedding Getaway in the Datsun B210",
+      "place": "Tucumcari, New Mexico",
+      "coords": [
+        -103.7231,
+        35.1537
+      ],
+      "zoom": 14.0,
+      "pitch": 74,
+      "bearing": 132,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m20_01.jpg",
+          "width": 1600,
+          "height": 1053
+        }
+      ],
+      "elevM": 1254,
+      "elevFt": 4114
+    },
+    {
+      "id": "m19",
+      "row": 19,
+      "submittedAt": "11/4/2026 8:55:01",
+      "text": "Honeymoon at cabins at Vallecito Lake.",
+      "rawLocation": "https://maps.app.goo.gl/ZeSpKRTmHviNaXGN9?g_st=i",
+      "order": 9,
+      "chapter": "debbie",
+      "title": "Honeymoon Cabins by the Water",
+      "place": "Vallecito Lake, Colorado",
+      "coords": [
+        -107.543,
+        37.4032
+      ],
+      "zoom": 13.7,
+      "pitch": 75,
+      "bearing": 12,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m19_01.jpg",
+          "width": 1600,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/m19_02.jpg",
+          "width": 1600,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/m19_03.jpg",
+          "width": 1600,
+          "height": 1600
+        }
+      ],
+      "elevM": 2332,
+      "elevFt": 7651
+    },
+    {
+      "id": "m21",
+      "row": 21,
+      "submittedAt": "11/4/2026 14:43:25",
+      "text": "We were at a family reunion in Pennsylvania where the entire 27 cousins were there with our aunts and uncles.  We had a talent show.  Danny dressed up as General George Patton in the WW11 movie.  He was HILARIOUS!!!!! It was the summer of 1987",
+      "rawLocation": "Southern Pennsylvania",
+      "order": 10,
+      "chapter": "debbie",
+      "title": "General Patton at the ’87 Reunion",
+      "place": "Laurel Highlands · Southern PA",
+      "coords": [
+        -79.08,
+        40.015
+      ],
+      "zoom": 13.2,
+      "pitch": 73,
+      "bearing": -32,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m21_01.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 649,
+      "elevFt": 2129
+    },
+    {
+      "id": "m10",
+      "row": 10,
+      "submittedAt": "11/3/2026 18:54:17",
+      "text": "Moved to Colorado Springs. First time to live outside of Amarillo, TX!",
+      "rawLocation": "https://maps.app.goo.gl/wgAiiXtnwHkUBqmEA",
+      "order": 11,
+      "chapter": "front-range",
+      "title": "First Home Beyond Amarillo",
+      "place": "Half Turn Rd · Colorado Springs, CO",
+      "coords": [
+        -104.7565,
+        38.886
+      ],
+      "zoom": 14.3,
+      "pitch": 74,
+      "bearing": -96,
+      "media": [],
+      "elevM": 1956,
+      "elevFt": 6417
+    },
+    {
+      "id": "m32",
+      "row": 32,
+      "submittedAt": "11/4/2026 18:49:31",
+      "text": "My Birthday wish for Danny is gratitude. Thank you for being in our lives from the beginning. You give us laughter and meaning. Blessings and Love. Our Wedding Jim and Rhonda",
+      "rawLocation": "https://maps.app.goo.gl/dXwczUMeJP1jmgDj8",
+      "order": 12,
+      "chapter": "front-range",
+      "title": "Laughter & Gratitude From the Start",
+      "place": "Colorado Springs, Colorado",
+      "coords": [
+        -104.7626,
+        38.9549
+      ],
+      "zoom": 13.9,
+      "pitch": 74,
+      "bearing": -104,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m32_01.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 2091,
+      "elevFt": 6860
+    },
+    {
+      "id": "m08",
+      "row": 8,
+      "submittedAt": "11/3/2026 14:20:49",
+      "text": "Our Russell family of 5 has memories of sleeping over with Danny and Debbie in their home in Colorado Springs. Danny and Debbie were always super hospitable to us. I remember big meals, walks around their backyard garden, walks around the neighborhood and the boys’ old toys they would put out for my kids to use. Danny would talk about how the buffs were playing, old hunting buddies, his boys and splash in a bit of some controversial politics.These are really good memories!! Thank you, Danny, for being such a great uncle!",
+      "rawLocation": "House in monument",
+      "order": 13,
+      "chapter": "front-range",
+      "title": "Open Doors on Pine Vista Place",
+      "place": "18245 Pine Vista Pl · Monument, CO",
+      "coords": [
+        -104.7563,
+        39.0954
+      ],
+      "zoom": 14.5,
+      "pitch": 74,
+      "bearing": -102,
+      "media": [],
+      "elevM": 2286,
+      "elevFt": 7500
+    },
+    {
+      "id": "m28",
+      "row": 28,
+      "submittedAt": "11/4/2026 15:12:27",
+      "text": "This was crazy Dan during the Covid shut down.  He made a recording of himself as Donald Trump talking about the shortage of toilet paper!\nHILARIOUS!!!! March 2020",
+      "rawLocation": "Dan’s home in Colorado Springs",
+      "order": 14,
+      "chapter": "front-range",
+      "title": "March 2020 Quarantine Dispatch",
+      "place": "Pine Vista Pl · Monument, CO",
+      "coords": [
+        -104.7549,
+        39.0961
+      ],
+      "zoom": 14.7,
+      "pitch": 74,
+      "bearing": -88,
+      "media": [
+        {
+          "type": "video",
+          "src": "media/m28_01.mp4",
+          "poster": "media/m28_01_poster.jpg",
+          "width": 224,
+          "height": 128,
+          "duration": 51.7
+        }
+      ],
+      "elevM": 2282,
+      "elevFt": 7487
+    },
+    {
+      "id": "m22",
+      "row": 22,
+      "submittedAt": "11/4/2026 14:47:24",
+      "text": "He and his boys when the colors were changing.  \nWe came up and took a little trip to Cripple Creek to see the aspens.  Beautiful",
+      "rawLocation": "Cripple Creek, CO",
+      "order": 15,
+      "chapter": "front-range",
+      "title": "Golden Aspens With His Boys",
+      "place": "Cripple Creek, Colorado",
+      "coords": [
+        -105.1783,
+        38.7467
+      ],
+      "zoom": 13.9,
+      "pitch": 75,
+      "bearing": 48,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m22_01.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 2889,
+      "elevFt": 9478
+    },
+    {
+      "id": "m09",
+      "row": 9,
+      "submittedAt": "11/3/2026 17:27:15",
+      "text": "When we went to the Aggies vs Buffs football game at Mile High Stadium with Taylor and Matt. Then went back to Taylor’s house and spent the night.",
+      "rawLocation": "https://maps.app.goo.gl/NF2ZrG1YkVmjXXdA8?g_st=ic",
+      "order": 16,
+      "chapter": "front-range",
+      "title": "Aggies vs. Buffs at Mile High",
+      "place": "Empower Field · Denver, CO",
+      "coords": [
+        -105.0192,
+        39.744
+      ],
+      "zoom": 15.4,
+      "pitch": 73,
+      "bearing": -85,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m09_01.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m09_02.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 1581,
+      "elevFt": 5187
+    },
+    {
+      "id": "m23",
+      "row": 23,
+      "submittedAt": "11/4/2026 14:49:35",
+      "text": "Dan and his nephew, Seanor were sking together!",
+      "rawLocation": "Somewhere near Breckenridge, CO",
+      "order": 17,
+      "chapter": "high-country",
+      "title": "Carving Turns Together",
+      "place": "Near Breckenridge, Colorado",
+      "coords": [
+        -106.0667,
+        39.4802
+      ],
+      "zoom": 13.8,
+      "pitch": 75,
+      "bearing": -102,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m23_01.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 3034,
+      "elevFt": 9954
+    },
+    {
+      "id": "m17",
+      "row": 17,
+      "submittedAt": "11/3/2026 21:36:43",
+      "text": "Grooving to party tunes on the dance floor at Taylor’s wedding.",
+      "rawLocation": "Breckenridge CO",
+      "order": 18,
+      "chapter": "high-country",
+      "title": "Grooving at Taylor’s Wedding",
+      "place": "Breckenridge, Colorado",
+      "coords": [
+        -106.0465,
+        39.4829
+      ],
+      "zoom": 14.4,
+      "pitch": 75,
+      "bearing": -96,
+      "media": [],
+      "elevM": 2915,
+      "elevFt": 9564
+    },
+    {
+      "id": "m37",
+      "row": 37,
+      "submittedAt": "11/4/2026 20:06:21",
+      "text": "Officiating our wedding!",
+      "rawLocation": "https://maps.app.goo.gl/9zPNYPoifB33mUpT6?g_st=ic",
+      "order": 19,
+      "chapter": "high-country",
+      "title": "Officiating in the Mountains",
+      "place": "BlueSky · Breckenridge, CO",
+      "coords": [
+        -106.0522,
+        39.4765
+      ],
+      "zoom": 14.6,
+      "pitch": 75,
+      "bearing": -82,
+      "media": [],
+      "elevM": 2974,
+      "elevFt": 9757
+    },
+    {
+      "id": "m18",
+      "row": 18,
+      "submittedAt": "11/3/2026 21:57:18",
+      "text": "His conversations and sightings of Clinton Eastwood and Kevin Costner at my wedding.",
+      "rawLocation": "Four Seasons Hotel Austin Texas",
+      "order": 20,
+      "chapter": "high-country",
+      "title": "Wedding Sightings in Austin",
+      "place": "Four Seasons · Austin, TX",
+      "coords": [
+        -97.7419,
+        30.2616
+      ],
+      "zoom": 15.5,
+      "pitch": 72,
+      "bearing": -58,
+      "media": [],
+      "elevM": 145,
+      "elevFt": 476
+    },
+    {
+      "id": "m33",
+      "row": 33,
+      "submittedAt": "11/4/2026 18:55:46",
+      "text": "Camping trip to Trujillo meadows so Danny and Jim could scout the area for their next hunting trip. Jim loved the hunting trips. The preparations the hunt and all the memories.",
+      "rawLocation": "https://maps.app.goo.gl/eLye2oZtq8S7bdWw9",
+      "order": 21,
+      "chapter": "high-country",
+      "title": "Scouting Camp With Jim",
+      "place": "Trujillo Meadows, Colorado",
+      "coords": [
+        -106.4495,
+        37.0466
+      ],
+      "zoom": 14.0,
+      "pitch": 75,
+      "bearing": -38,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m33_01.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m33_02.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m33_03.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m33_04.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m33_05.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 3097,
+      "elevFt": 10161
+    },
+    {
+      "id": "m36",
+      "row": 36,
+      "submittedAt": "11/4/2026 19:36:55",
+      "text": "Elk Hunt with Matt, Dad and Jim in 2015",
+      "rawLocation": "https://maps.app.goo.gl/SP1PYc6vPoEn9e5x6?g_st=ic",
+      "order": 22,
+      "chapter": "high-country",
+      "title": "2015 Elk Hunt",
+      "place": "San Juan Wilderness, Colorado",
+      "coords": [
+        -106.6234,
+        37.3385
+      ],
+      "zoom": 13.7,
+      "pitch": 76,
+      "bearing": 35,
+      "media": [],
+      "elevM": 3637,
+      "elevFt": 11932
+    },
+    {
+      "id": "m07",
+      "row": 7,
+      "submittedAt": "11/3/2026 14:10:32",
+      "text": "From Trey - ‘1. ding ding ding’ and 2. ‘ummm…. you are a little close for that’.",
+      "rawLocation": "Platoro, Colorado for both.",
+      "order": 23,
+      "chapter": "high-country",
+      "title": "Two Classics From Platoro",
+      "place": "Platoro, Colorado",
+      "coords": [
+        -106.5328,
+        37.352
+      ],
+      "zoom": 14.1,
+      "pitch": 75,
+      "bearing": -52,
+      "media": [],
+      "elevM": 3000,
+      "elevFt": 9843
+    },
+    {
+      "id": "m35",
+      "row": 35,
+      "submittedAt": "11/4/2026 19:13:03",
+      "text": "I asked Danny to spread ashes so Jim had one last hunt.",
+      "rawLocation": "https://www.google.com/maps/place/Mix+Lake+Campground/@37.3596728,-106.552562,14.94z/data=!4m15!1m8!3m7!1s0x871602804ef89b23:0x36cec5323ff7e8e5!2sPlatoro,+CO+81132!3b1!8m2!3d37.3519502!4d-106.5328145!16s%2Fm%2F048q22y!3m5!1s0x873df8817e8e50d7:0xaf6bfebe034ce8b!8m2!3d37.35784!4d-106.54266!16s%2Fg%2F1tcvzx45?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
+      "order": 24,
+      "chapter": "high-country",
+      "title": "One Last Hunt for Jim",
+      "place": "Mix Lake Campground · Platoro, CO",
+      "coords": [
+        -106.5427,
+        37.3578
+      ],
+      "zoom": 14.3,
+      "pitch": 75,
+      "bearing": 24,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m35_01.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 3044,
+      "elevFt": 9987
+    },
+    {
+      "id": "m34",
+      "row": 34,
+      "submittedAt": "11/4/2026 19:03:23",
+      "text": "Planning an elk hunt.",
+      "rawLocation": "https://www.google.com/maps/place/Secluded+Cabin+on+11+Acres+w+%2FMountain+Views!+25+Min+to+Telluride!/@38.0454863,-108.6870786,8.88z/data=!4m15!1m2!2m1!1srustic+cabin+on+the+shortcut+to+teluride+co!3m11!1s0x873f2a9d3c1b1f3d:0x1e9b1718d98bcbd4!5m3!1s2026-11-19!4m1!1i2!8m2!3d37.9181709!4d-108.0136108!15sCixydXN0aWMgY2FiaW4gb24gdGhlIHNob3J0Y3V0IHRvIHRlbGx1cmlkZSBjb5IBD3ZhY2F0aW9uX3JlbnRhbOABAA!16s%2Fg%2F11mdsp78lv!17BQ0FF?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
+      "order": 25,
+      "chapter": "high-country",
+      "title": "Planning the Next Elk Hunt",
+      "place": "Mountain Cabin · Near Telluride, CO",
+      "coords": [
+        -108.0136,
+        37.9182
+      ],
+      "zoom": 13.7,
+      "pitch": 76,
+      "bearing": 132,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m34_01.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 2895,
+      "elevFt": 9498
+    },
+    {
+      "id": "m04",
+      "row": 4,
+      "submittedAt": "11/3/2026 12:52:10",
+      "text": "Riding horse in Telluride",
+      "rawLocation": "https://maps.app.goo.gl/iwq9meyCv9EC6LMR9?g_st=ac",
+      "order": 26,
+      "chapter": "high-country",
+      "title": "Riding Horseback Under the Peaks",
+      "place": "Telluride, Colorado",
+      "coords": [
+        -108.0528,
+        38.0753
+      ],
+      "zoom": 13.6,
+      "pitch": 76,
+      "bearing": 158,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m04_01.jpg",
+          "width": 1600,
+          "height": 720
+        }
+      ],
+      "elevM": 2572,
+      "elevFt": 8438
+    },
+    {
+      "id": "m06",
+      "row": 6,
+      "submittedAt": "11/3/2026 13:28:27",
+      "text": "That time when we were back packing and he had his binoculars out and saw a woman flipping him off from down the valley.",
+      "rawLocation": "Outside of Ouray I think https://maps.apple/p/Wi4DEuMy.agFQw",
+      "order": 27,
+      "chapter": "high-country",
+      "title": "Binoculars Down the Valley",
+      "place": "Outside Ouray, Colorado",
+      "coords": [
+        -107.6707,
+        38.0228
+      ],
+      "zoom": 13.9,
+      "pitch": 76,
+      "bearing": 172,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m06_01.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m06_02.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 2375,
+      "elevFt": 7792
+    },
+    {
+      "id": "m13",
+      "row": 13,
+      "submittedAt": "11/3/2026 19:27:26",
+      "text": "A visit to Moab when Matt was studying soils at CU.",
+      "rawLocation": "https://maps.app.goo.gl/FxyN3qD5gwA7joj38",
+      "order": 28,
+      "chapter": "high-country",
+      "title": "Red Rock & Soils Visit",
+      "place": "Mesa Arch · Moab, Utah",
+      "coords": [
+        -109.8658,
+        38.3885
+      ],
+      "zoom": 14.4,
+      "pitch": 75,
+      "bearing": 112,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m13_01.jpg",
+          "width": 1600,
+          "height": 1067
+        }
+      ],
+      "elevM": 1881,
+      "elevFt": 6171
+    },
+    {
+      "id": "m11",
+      "row": 11,
+      "submittedAt": "11/3/2026 19:04:22",
+      "text": "Fun in the Sun. Celebrating Taylor's high school graduation in CANCUN.",
+      "rawLocation": "https://maps.app.goo.gl/qKFsWex33qVYgtYu8",
+      "order": 29,
+      "chapter": "far-horizons",
+      "title": "Sun & Graduation in Cancún",
+      "place": "Isla Mujeres · Cancún, Mexico",
+      "coords": [
+        -86.7527,
+        21.2146
+      ],
+      "zoom": 14.0,
+      "pitch": 72,
+      "bearing": -32,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m11_01.jpg",
+          "width": 1600,
+          "height": 1199
+        }
+      ],
+      "elevM": 0,
+      "elevFt": 0
+    },
+    {
+      "id": "m29",
+      "row": 29,
+      "submittedAt": "11/4/2026 17:06:33",
+      "text": "Happy birthday Danny from those above and here on earth! We celebrate you as you take another trip around the sun with all those who love you! Cheers! Love Jane",
+      "rawLocation": "https://maps.app.goo.gl/P6PoMiFbx2gaD13f8",
+      "order": 30,
+      "chapter": "far-horizons",
+      "title": "Another Trip Around the Sun",
+      "place": "Pelican Resort · Sint Maarten",
+      "coords": [
+        -63.0946,
+        18.0302
+      ],
+      "zoom": 14.3,
+      "pitch": 73,
+      "bearing": 48,
+      "media": [],
+      "elevM": 6,
+      "elevFt": 20
+    },
+    {
+      "id": "m31",
+      "row": 31,
+      "submittedAt": "11/4/2026 18:37:20",
+      "text": "Geo and Danny liked to have fun and make us laugh.",
+      "rawLocation": "https://maps.app.goo.gl/viGmCZXF6KitFigMA",
+      "order": 31,
+      "chapter": "far-horizons",
+      "title": "Geo & Danny on Kauaʻi",
+      "place": "Pono Kai · Kapaʻa, Hawaii",
+      "coords": [
+        -159.3189,
+        22.0731
+      ],
+      "zoom": 14.0,
+      "pitch": 74,
+      "bearing": -72,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m31_01.jpg",
+          "width": 1600,
+          "height": 1066
+        }
+      ],
+      "elevM": 4,
+      "elevFt": 13
+    },
+    {
+      "id": "m14",
+      "row": 14,
+      "submittedAt": "11/3/2026 19:37:43",
+      "text": "Our first trip to France, we joined Matt and Colin to tour Notre-Dame de Paris. 2011",
+      "rawLocation": "https://maps.app.goo.gl/xZjJjVm6YEFR9nra6",
+      "order": 32,
+      "chapter": "far-horizons",
+      "title": "First Trip to France · 2011",
+      "place": "Notre-Dame de Paris · France",
+      "coords": [
+        2.3499,
+        48.853
+      ],
+      "zoom": 15.8,
+      "pitch": 72,
+      "bearing": -36,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m14_01.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/m14_02.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/m14_03.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 38,
+      "elevFt": 125
+    },
+    {
+      "id": "m05",
+      "row": 5,
+      "submittedAt": "11/3/2026 13:09:23",
+      "text": "1st time in Crespinhac for a traditional french meal, Danny's face when he realized he had eaten a ton of \"entrée\" and there were going to be 3 or 4 other courses after that.",
+      "rawLocation": "https://maps.app.goo.gl/mx2bArDBLfpEWbSB6",
+      "order": 33,
+      "chapter": "far-horizons",
+      "title": "The French ‘Entrée’ Surprise",
+      "place": "Crespinhac · Haute-Loire, France",
+      "coords": [
+        4.0096,
+        45.2502
+      ],
+      "zoom": 14.5,
+      "pitch": 74,
+      "bearing": 28,
+      "media": [],
+      "elevM": 658,
+      "elevFt": 2159
+    },
+    {
+      "id": "m15",
+      "row": 15,
+      "submittedAt": "11/3/2026 19:45:46",
+      "text": "Danny is ready to eat his first big meal at chez de Provost ;)",
+      "rawLocation": "https://maps.app.goo.gl/MPPnr1sse8uvABB67",
+      "order": 34,
+      "chapter": "far-horizons",
+      "title": "First Big Feast Chez Provost",
+      "place": "Crespinhac · Solignac-sous-Roche, France",
+      "coords": [
+        4.0088,
+        45.2519
+      ],
+      "zoom": 14.7,
+      "pitch": 74,
+      "bearing": 68,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m15_01.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m15_02.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 668,
+      "elevFt": 2192
+    },
+    {
+      "id": "m16",
+      "row": 16,
+      "submittedAt": "11/3/2026 19:56:29",
+      "text": "French grapes, French wine, & French Cherries too!",
+      "rawLocation": "https://maps.app.goo.gl/jGQHG1KMHTjTVWpQ7",
+      "order": 35,
+      "chapter": "far-horizons",
+      "title": "Grapes, Wine & French Cherries",
+      "place": "Domaine Guion · Provence, France",
+      "coords": [
+        5.3947,
+        43.7371
+      ],
+      "zoom": 14.2,
+      "pitch": 74,
+      "bearing": 12,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m16_01.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m16_02.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m16_03.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 259,
+      "elevFt": 850
+    },
+    {
+      "id": "m12",
+      "row": 12,
+      "submittedAt": "11/3/2026 19:20:08",
+      "text": "Matt, Danny and I met Taylor in New Zealand when he did his study abroad in Australia.",
+      "rawLocation": "https://maps.app.goo.gl/5Eiov1brrmeXFX1h6",
+      "order": 36,
+      "chapter": "far-horizons",
+      "title": "Reunited in Ross, New Zealand",
+      "place": "Ross · West Coast, New Zealand",
+      "coords": [
+        170.8174,
+        -42.8992
+      ],
+      "zoom": 13.5,
+      "pitch": 75,
+      "bearing": 132,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m12_01.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m12_02.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/m12_03.jpg",
+          "width": 1600,
+          "height": 1199
+        }
+      ],
+      "elevM": 36,
+      "elevFt": 118
+    },
+    {
+      "id": "m03",
+      "row": 3,
+      "submittedAt": "11/3/2026 12:38:18",
+      "text": "Hiking mt Morrison on his 70th. Only Slightly hung over",
+      "rawLocation": "https://maps.app.goo.gl/r4WU7NXZsSPU7PYPA?g_st=ic",
+      "order": 37,
+      "chapter": "seventy",
+      "title": "Summit on His 70th Birthday",
+      "place": "Mount Morrison · Colorado",
+      "coords": [
+        -105.22,
+        39.6692
+      ],
+      "zoom": 14.3,
+      "pitch": 76,
+      "bearing": -48,
+      "media": [
+        {
+          "type": "image",
+          "src": "media/m03_01.jpg",
+          "width": 1200,
+          "height": 1600
+        }
+      ],
+      "elevM": 2390,
+      "elevFt": 7841
+    }
+  ]
+}

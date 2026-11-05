@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Danny Ross · Seventy Years Across the Landscape</title>
+  <meta name="description" content="An interactive 3D landscape and field journal of the places Danny Ross has walked and the memories shared by family and friends for his 70th birthday.">
+  <meta name="theme-color" content="#1b2c3b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='17' fill='%23f6f1e6' stroke='%23243b2f' stroke-width='1.5'/%3E%3Cpath d='M6 24c4-6 7-9 10-9 2.5 0 4 2.5 5.5 2.5S25 13 29 13' fill='none' stroke='%23c96a3b' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M5 27c5-4 9-5.5 13-5.5s8 1.5 13 4.5' fill='none' stroke='%23243b2f' stroke-opacity='.45' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='15' r='2.3' fill='%23243b2f'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <!-- Full-bleed 3D Landscape + Golden-Hour Trailhead FX Layer -->
+  <div class="stage" id="stage">
+    <div class="globe-canvas" id="globe-canvas" aria-label="Interactive 3D terrain map of Danny Ross's memories"></div>
+    <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- Loading Indicator -->
+    <div class="loader" id="loader" role="status" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Preparing the trail…</span>
+    </div>
+
+    <!-- Top Masthead -->
+    <header class="topbar chrome">
+      <button class="brand" id="home-btn" type="button" title="Return to full horizon overview">
+        <span class="brand-emblem" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
+            <path d="M4 22.5 12.2 11l5.1 6.6 3.7-4.6L28 22.5H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <circle cx="22.5" cy="8.5" r="2" fill="#c96a3b"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-kicker">Seventy Years · Field Atlas</span>
+          <span class="brand-title">Danny Ross</span>
+        </span>
+      </button>
+
+      <div class="top-actions">
+        <button class="pill-btn" id="memories-btn" type="button" aria-expanded="false" aria-controls="drawer">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M5 4h14a2 2 0 0 1 2 2v13a1 1 0 0 1-1.5.86L12 15.5l-7.5 4.36A1 1 0 0 1 3 19V6a2 2 0 0 1 2-2Zm0 2v11.27l7-4.07 7 4.07V6H5Z"/></svg>
+          <span>Field Notes</span>
+          <b class="count-pill" id="memory-count">37</b>
+        </button>
+        <button class="pill-btn ghost" id="cinema-btn" type="button" title="Cinema Mode for clean video recording (press C)">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v10h16V7H4Zm5.5 2.2 5.5 2.8-5.5 2.8V9.2Z"/></svg>
+          <span>Cinema</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Cinema Mode Subtle Exit Pill -->
+    <button class="cinema-exit" id="cinema-exit" type="button" hidden title="Exit Cinema Mode (Esc or C)">
+      Exit Cinema · Esc
+    </button>
+
+    <!-- Opening Field Atlas Cover Card (Overview) -->
+    <section class="hero-card" id="hero-card" aria-labelledby="hero-heading">
+      <div class="hero-stamp-row">
+        <p class="eyebrow">Happy 70th Birthday, Danny</p>
+        <span class="topo-badge">1956 — 2026</span>
+      </div>
+      <h1 id="hero-heading">A Life Walked Across Landscapes &amp; Loved Ones</h1>
+      <p class="hero-lede" id="hero-summary">
+        Every trail marker across these hills and horizons holds a story from family and friends—from Amarillo ballfields and San Juan elk camps to France and Ross, New Zealand.
+      </p>
+      <div class="hero-cta">
+        <button class="primary-btn" id="start-tour-btn" type="button">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+          <span>Walk the Trail</span>
+        </button>
+        <button class="secondary-btn" id="open-index-btn" type="button">
+          Browse Field Notes
+        </button>
+      </div>
+      <div class="hero-chapters" id="hero-chapters" aria-label="Jump to a chapter"></div>
+    </section>
+
+    <!-- Chapter Transition Trailhead Sign -->
+    <div class="chapter-banner" id="chapter-banner" aria-hidden="true" hidden>
+      <p class="chapter-roman" id="chapter-roman"></p>
+      <h2 class="chapter-name" id="chapter-name"></h2>
+    </div>
+
+    <!-- Floating Field Journal Memory Card (Appears on arrival at each trailhead) -->
+    <article class="memory-card" id="memory-card" aria-live="polite" hidden>
+      <div class="mc-header">
+        <div class="mc-meta-row">
+          <span class="mc-chapter" id="mc-chapter"></span>
+          <span class="mc-step" id="mc-step"></span>
+        </div>
+        <h2 class="mc-title" id="mc-title"></h2>
+        <div class="mc-locus">
+          <p class="mc-place" id="mc-place">
+            <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+            <span id="mc-place-text"></span>
+          </p>
+          <p class="mc-coords" id="mc-coords"></p>
+        </div>
+      </div>
+
+      <div class="mc-media" id="mc-media" hidden>
+        <div class="mc-stage" id="mc-stage"></div>
+        <div class="mc-gallery-nav" id="mc-gallery-nav" hidden>
+          <button class="mc-nav-arrow" id="mc-prev-img" type="button" aria-label="Previous photo">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+          </button>
+          <div class="mc-dots" id="mc-dots"></div>
+          <span class="mc-img-count" id="mc-img-count"></span>
+          <button class="mc-nav-arrow" id="mc-next-img" type="button" aria-label="Next photo">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mc-body" id="mc-body"></div>
+
+      <div class="mc-progress-track" aria-hidden="true">
+        <div class="mc-progress-bar" id="mc-progress-bar"></div>
+      </div>
+    </article>
+
+    <!-- Bottom Trail Transport Controls -->
+    <nav class="tour-bar chrome" id="tour-bar" aria-label="Trail playback controls" hidden>
+      <button class="ctrl-btn icon-only" id="prev-btn" type="button" title="Previous stop (Left arrow)" aria-label="Previous stop">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M6 6h2v12H6V6Zm3.5 6 8.5 6V6l-8.5 6Z"/></svg>
+      </button>
+      <button class="ctrl-btn play-toggle" id="play-btn" type="button" title="Play or pause walk (Space)">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+        <span>Pause</span>
+      </button>
+      <button class="ctrl-btn icon-only" id="next-btn" type="button" title="Next stop (Right arrow)" aria-label="Next stop">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="m6 18 8.5-6L6 6v12ZM16 6v12h2V6h-2Z"/></svg>
+      </button>
+
+      <span class="bar-sep" aria-hidden="true"></span>
+
+      <button class="ctrl-btn subtle" id="globe-btn" type="button" title="Pull back to full Earth overview">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3a15.7 15.7 0 0 0-1.3-3.5A8 8 0 0 1 18.9 8ZM12 4c.8 1.2 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.8 1.9-4ZM4.3 14a8.2 8.2 0 0 1 0-4h3.3a16.5 16.5 0 0 0 0 4H4.3Zm.8 2h3c.3 1.2.7 2.4 1.3 3.5A8 8 0 0 1 5.1 16Zm3-8h-3a8 8 0 0 1 4.3-3.5A15.7 15.7 0 0 0 8.1 8ZM12 20a14 14 0 0 1-1.9-4h3.8A14 14 0 0 1 12 20Zm2.3-6H9.7a14.7 14.7 0 0 1 0-4h4.6a14.7 14.7 0 0 1 0 4Zm.3 5.5c.6-1.1 1-2.3 1.3-3.5h3a8 8 0 0 1-4.3 3.5ZM16.4 14a16.5 16.5 0 0 0 0-4h3.3a8.2 8.2 0 0 1 0 4h-3.3Z"/></svg>
+        <span>Atlas</span>
+      </button>
+
+      <button class="ctrl-btn subtle" id="pace-btn" type="button" title="Adjust walking & reading pace">
+        <span id="pace-label">Pace: Stroll</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Slide-over Field Notes Index Drawer -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" aria-label="All birthday field notes" hidden>
+    <div class="drawer-head">
+      <div>
+        <p class="eyebrow">70th Birthday Field Journal</p>
+        <h2>All Places &amp; Memories</h2>
+      </div>
+      <button class="icon-close" id="drawer-close" type="button" aria-label="Close field notes">
+        <svg viewBox="0 0 24 24" width="19" height="19"><path fill="currentColor" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+      </button>
+    </div>
+
+    <div class="drawer-controls">
+      <label class="search-box">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5Zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Z"/></svg>
+        <input id="search-input" type="search" autocomplete="off" placeholder="Search places, peaks, stories, or friends…">
+      </label>
+      <div class="filter-chips" id="drawer-chips" role="group" aria-label="Filter by chapter"></div>
+    </div>
+
+    <div class="drawer-list" id="drawer-list"></div>
+
+    <footer class="drawer-foot">
+      <span>Synced from <a id="sheet-link" target="_blank" rel="noopener">the Birthday Memories Sheet</a></span>
+    </footer>
+  </aside>
+
+  <!-- Fullscreen Archival Print Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Full size photograph" hidden>
+    <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close photograph">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+    </button>
+    <div class="lightbox-frame">
+      <img id="lightbox-img" alt="">
+    </div>
+    <p class="lightbox-caption" id="lightbox-caption"></p>
+  </div>
+</body>
+</html>
