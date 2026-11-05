@@ -179,46 +179,15 @@ const STYLE = {
   },
 };
 
-// ---------- Spherical geometry helpers ----------
+// ---------- Spherical geometry & easing helpers ----------
 const R = 6371008.8;
 const toRad = (d) => (d * Math.PI) / 180;
 const toDeg = (r) => (r * 180) / Math.PI;
-const clamp01 = (x) => Math.max(0, Math.min(1, x));
-const smootherstep = (x) => {
-  const c = clamp01(x);
-  return c * c * c * (c * (c * 6 - 15) + 10);
-};
-const shortestBearingDelta = (from, to) => ((to - from + 540) % 360) - 180;
+const mod = (n, m) => ((n % m) + m) % m;
+const shortestDelta = (from, to) => mod(to - from + 180, 360) - 180;
 
-// Exact spherical linear interpolation point at fraction t in [0, 1] (antimeridian-safe)
-function greatCirclePoint(a, b, t) {
-  const f = clamp01(t);
-  const [lon1, lat1] = [toRad(a[0]), toRad(a[1])];
-  const [lon2, lat2] = [toRad(b[0]), toRad(b[1])];
-  const v1 = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
-  const v2 = [Math.cos(lat2) * Math.cos(lon2), Math.cos(lat2) * Math.sin(lon2), Math.sin(lat2)];
-  const dot = Math.max(-1, Math.min(1, v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]));
-  const omega = Math.acos(dot);
-  if (omega < 1e-6) {
-    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
-  }
-  const sinO = Math.sin(omega);
-  const s1 = Math.sin((1 - f) * omega) / sinO;
-  const s2 = Math.sin(f * omega) / sinO;
-  const x = s1 * v1[0] + s2 * v2[0];
-  const y = s1 * v1[1] + s2 * v2[1];
-  const z = s1 * v1[2] + s2 * v2[2];
-  return [toDeg(Math.atan2(y, x)), toDeg(Math.atan2(z, Math.hypot(x, y)))];
-}
-
-function lerpPadding(p0, p1, t) {
-  return {
-    top: (p0.top || 0) + ((p1.top || 0) - (p0.top || 0)) * t,
-    right: (p0.right || 0) + ((p1.right || 0) - (p0.right || 0)) * t,
-    bottom: (p0.bottom || 0) + ((p1.bottom || 0) - (p0.bottom || 0)) * t,
-    left: (p0.left || 0) + ((p1.left || 0) - (p0.left || 0)) * t,
-  };
-}
+const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeInOutSine = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
 
 function circlePolygon([lon, lat], meters, steps = 20) {
   const ring = [];
@@ -287,8 +256,8 @@ export class Globe3D {
     this.chapterColors = new Map();
     this.markers = new Map();
     this.activeId = null;
-    this.flightRaf = 0;
-    this.orbitRaf = 0;
+    this.flightToken = 0;
+    this.stageCleanup = null;
     this.fxRaf = 0;
     this.blooms = [];
     this.programmatic = false;
@@ -303,11 +272,11 @@ export class Globe3D {
       style: STYLE,
       center: [-98, 34],
       zoom: this.idealGlobeZoom(),
-      pitch: 14,
+      pitch: 10,
       bearing: 0,
-      maxPitch: 76,
+      maxPitch: 72,
       attributionControl: { compact: true },
-      pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+      pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       fadeDuration: 0,
     });
 
@@ -317,46 +286,7 @@ export class Globe3D {
     );
 
     await new Promise((r) => (this.map.isStyleLoaded() ? r() : this.map.once('style.load', r)));
-    this.map.setTerrain({ source: 'dem', exaggeration: 1.55 });
-
-    // Hard real-time 3D terrain & ridge-sightline clearance guard:
-    // Guarantees the camera eye AND foreground line-of-sight NEVER dip into or clip through terrain.
-    this.map.transformCameraUpdate = (tr) => {
-      if (!this.map?.terrain || tr.zoom < 6.2) return {};
-      const terrain = this.map.terrain;
-      const camLL = tr.getCameraLngLat();
-      const camAlt = tr.getCameraAltitude();
-      const centerLL = tr.center;
-      const targetAlt = tr.elevation || 0;
-
-      // Minimum vertical safety clearance above ground right under the camera lens (meters)
-      const minEyeClearance = Math.max(135, 135 * Math.pow(2, Math.max(0, 14.3 - tr.zoom) * 0.44));
-      let reqCamAlt = (terrain.getElevationForLngLatZoom(camLL, tr.zoom) || 0) + minEyeClearance;
-
-      // Also sample 3 points along the foreground sightline so intervening ridges never slice the view
-      for (const f of [0.22, 0.45, 0.68]) {
-        const sampleLL = new maplibregl.LngLat(
-          camLL.lng + (centerLL.lng - camLL.lng) * f,
-          camLL.lat + (centerLL.lat - camLL.lat) * f
-        );
-        const groundAtSample = terrain.getElevationForLngLatZoom(sampleLL, tr.zoom) || 0;
-        const margin = minEyeClearance * (1 - f * 0.68);
-        const aimAlt = targetAlt + 24;
-        const neededEyeAlt = (groundAtSample + margin - aimAlt * f) / (1 - f);
-        if (neededEyeAlt > reqCamAlt) reqCamAlt = neededEyeAlt;
-      }
-
-      if (camAlt < reqCamAlt && Number.isFinite(reqCamAlt)) {
-        const safe = this.map.calculateCameraOptionsFromTo(camLL, reqCamAlt, centerLL, targetAlt);
-        if (safe && Number.isFinite(safe.pitch) && Number.isFinite(safe.zoom)) {
-          return {
-            pitch: Math.min(tr.pitch, Math.max(0, safe.pitch)),
-            zoom: Math.min(tr.zoom, safe.zoom),
-          };
-        }
-      }
-      return {};
-    };
+    this.map.setTerrain({ source: 'dem', exaggeration: 1.48 });
 
     const empty = { type: 'FeatureCollection', features: [] };
     this.map.addSource('journey', { type: 'geojson', data: empty });
@@ -545,7 +475,7 @@ export class Globe3D {
   }
 
   resizeFxCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = this.container.clientWidth || window.innerWidth;
     const h = this.container.clientHeight || window.innerHeight;
     this.fxCanvas.width = Math.round(w * dpr);
@@ -698,9 +628,37 @@ export class Globe3D {
     });
   }
 
+  // Execute a single MapLibre native camera stage and resolve cleanly when complete or superseded
+  runCameraStage(token, options) {
+    return new Promise((resolve) => {
+      if (this.flightToken !== token || !this.map) {
+        resolve(false);
+        return;
+      }
+      let settled = false;
+      let fallbackTimer = 0;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(fallbackTimer);
+        this.map.off('moveend', finish);
+        if (this.stageCleanup === finish) this.stageCleanup = null;
+        resolve(this.flightToken === token);
+      };
+      this.stageCleanup = finish;
+      this.map.on('moveend', finish);
+      fallbackTimer = setTimeout(finish, (options.duration || 0) + 240);
+
+      this.programmatic = true;
+      this.map.easeTo({ ...options, essential: true });
+      this.programmatic = false;
+    });
+  }
+
   // Spin the whole Earth slowly in Field Atlas overview mode
-  globeOverview({ center = [-98, 28], immediate = false } = {}) {
+  async globeOverview({ center = [-98, 28], immediate = false } = {}) {
     this.stopOrbit();
+    const token = ++this.flightToken;
     this.activeId = null;
     this.setActiveHop(null, null);
     this.refreshSources(this.memories.length - 1);
@@ -712,25 +670,26 @@ export class Globe3D {
       : { top: 24, right: 0, bottom: 24, left: 340 };
 
     const startSpin = () => {
-      let last = performance.now();
-      const spin = (now) => {
-        const dt = Math.min(64, now - last);
-        last = now;
+      const spinStep = async () => {
+        if (this.flightToken !== token || this.activeId) return;
         const c = this.map.getCenter();
-        this.programmatic = true;
-        this.map.setCenter([c.lng + dt * 0.0028, c.lat]);
-        this.programmatic = false;
-        this.orbitRaf = requestAnimationFrame(spin);
+        const ok = await this.runCameraStage(token, {
+          center: [c.lng + 90, c.lat],
+          duration: 34000,
+          easing: (t) => t,
+        });
+        if (ok && !this.activeId) spinStep();
       };
-      this.orbitRaf = requestAnimationFrame(spin);
+      spinStep();
     };
 
+    const zTarget = this.idealGlobeZoom();
     if (immediate) {
       this.programmatic = true;
       this.map.jumpTo({
         center,
-        zoom: this.idealGlobeZoom(),
-        pitch: 12,
+        zoom: zTarget,
+        pitch: 10,
         bearing: 0,
         padding: overviewPad,
       });
@@ -739,208 +698,268 @@ export class Globe3D {
       return;
     }
 
-    const startPos = [this.map.getCenter().lng, this.map.getCenter().lat];
-    const z0 = this.map.getZoom();
-    const p0 = this.map.getPitch();
-    const b0 = this.map.getBearing();
-    const bDelta = shortestBearingDelta(b0, 0);
-    const pad0 = this.map.getPadding();
-    const z1 = this.idealGlobeZoom();
-    const pullDuration = 5600;
-    const t0 = performance.now();
+    // 1. Zoom straight out over current location first
+    const cur = this.map.getCenter();
+    const ok1 = await this.runCameraStage(token, {
+      center: [cur.lng, cur.lat],
+      zoom: zTarget,
+      pitch: 10,
+      bearing: 0,
+      padding: overviewPad,
+      duration: 4200,
+      easing: easeInOutCubic,
+    });
+    if (!ok1 || this.activeId) return;
 
-    const stepOut = (now) => {
-      const rawT = clamp01((now - t0) / pullDuration);
-      const u = smootherstep(rawT);
-      const pos = greatCirclePoint(startPos, center, smootherstep(clamp01((rawT - 0.15) / 0.85)));
-      const pitch = p0 + (12 - p0) * smootherstep(clamp01(rawT / 0.55));
-      const zoom = z0 + (z1 - z0) * u;
-      this.programmatic = true;
-      this.map.jumpTo({
-        center: pos,
-        zoom,
-        pitch,
-        bearing: b0 + bDelta * u,
-        padding: lerpPadding(pad0, overviewPad, u),
-      });
-      this.programmatic = false;
-      if (rawT < 1) {
-        this.flightRaf = requestAnimationFrame(stepOut);
-      } else {
-        this.flightRaf = 0;
-        this.syncPinVisibility();
-        if (!this.activeId) startSpin();
-      }
-    };
-    this.flightRaf = requestAnimationFrame(stepOut);
+    // 2. Gently rotate the globe to the overview framing
+    const ok2 = await this.runCameraStage(token, {
+      center,
+      zoom: zTarget,
+      pitch: 10,
+      bearing: 0,
+      padding: overviewPad,
+      duration: 3200,
+      easing: easeInOutSine,
+    });
+    if (!ok2 || this.activeId) return;
+
+    this.syncPinVisibility();
+    startSpin();
   }
 
-  // High-Clearance 3-Phase Sky-Arc Choreographer:
-  // Lifts cleanly up into the open sky with an overhead gaze, traverses high above all mountain
-  // ranges along the geodesic path, descends vertically over the destination, and gently raises
-  // its gaze to the horizon at the end—never freezing target elevation underground or clipping ridges.
-  flyToMemory(mem, prevMem, { visitedIndex = 0, speedMult = 1, onArrive } = {}) {
+  // Uncoupled 3-Act Globe & Landscape Choreographer:
+  // Act 1: Zoom smoothly straight out over the current place (lifting gaze to overhead).
+  // Act 2: Rotate the globe / glide high above at constant altitude & pitch (zero tile-pyramid thrashing).
+  // Act 3: Descend smoothly straight down onto the destination and gently lift gaze to the horizon.
+  async flyToMemory(mem, prevMem, { visitedIndex = 0, speedMult = 1, onArrive } = {}) {
     this.stopOrbit();
+    const token = ++this.flightToken;
     this.activeId = mem.id;
     this.refreshSources(visitedIndex);
     this.syncPinVisibility({ flyingToCoords: mem.coords });
 
     const startCenter = [this.map.getCenter().lng, this.map.getCenter().lat];
     const z0 = this.map.getZoom();
-    const p0 = this.map.getPitch();
     const b0 = this.map.getBearing();
-    const pad0 = this.map.getPadding();
 
     const km = distanceKm(startCenter, mem.coords);
     this.setActiveHop(prevMem ? prevMem.coords : km > 40 ? startCenter : null, mem.coords);
 
     const pad1 = this.cameraPadding(true);
-    const z1 = mem.zoom ?? 14.1;
-    const p1 = mem.pitch ?? 67;
+    const z1 = mem.zoom ?? 14.0;
+    const p1 = mem.pitch ?? 64;
     const b1 = mem.bearing ?? 0;
-    const bDelta = shortestBearingDelta(b0, b1);
 
-    const fromGlobe = !prevMem && z0 < 4.5;
-
-    // Meditative, unhurried durations scaled smoothly across local, regional, continental, and global hops
-    let duration;
-    if (fromGlobe) {
-      duration = 8800;
-    } else if (km < 3) {
-      duration = 5200;
-    } else if (km < 18) {
-      duration = 6600;
-    } else if (km < 250) {
-      duration = 8800 + (km / 250) * 3600;
-    } else if (km < 1500) {
-      duration = 12600 + ((km - 250) / 1250) * 4600;
-    } else if (km < 4500) {
-      duration = 17500 + ((km - 1500) / 3000) * 5000;
-    } else {
-      duration = 23500 + Math.min(1, (km - 4500) / 14500) * 6500;
-    }
-    duration = Math.round(duration * speedMult);
-
-    const myId = mem.id;
     let revealed = false;
-
     const revealArrival = () => {
-      if (revealed || this.activeId !== myId) return;
+      if (revealed || this.flightToken !== token || this.activeId !== mem.id) return;
       revealed = true;
       this.setActiveHop(null, null);
       this.triggerArrivalBloom(mem.coords, this.chapterColors.get(mem.chapter) || '#c96a3b');
       onArrive?.();
     };
 
-    if (speedMult === 0 || duration <= 0) {
+    if (speedMult === 0) {
       this.programmatic = true;
       this.map.jumpTo({ center: mem.coords, zoom: z1, pitch: p1, bearing: b1, padding: pad1 });
       this.programmatic = false;
       revealArrival();
       this.syncPinVisibility();
-      this.startLocalOrbit(mem);
+      this.startLocalOrbit(mem, token);
       return;
     }
 
-    // Continuous logarithmic sky-clearance ceiling zoom (guarantees climbing well above every peak)
-    const minGlobeZ = Math.max(1.45, this.idealGlobeZoom() + 0.08);
-    const rawApex = Math.max(minGlobeZ, Math.min(12.6, 13.35 - Math.log2(1 + km / 1.8) * 0.9));
-    const safeApex = Math.min(rawApex, z0 - 0.35, z1 - 0.8);
-    const pCruise = Math.max(10, Math.min(36, 40 - Math.log2(1 + km) * 2.8));
+    const fromGlobe = !prevMem && z0 < 4.5;
+    const minGlobeZ = this.idealGlobeZoom();
 
-    const t0 = performance.now();
-    const stepFlight = (now) => {
-      if (this.activeId !== myId) return;
-      const rawT = clamp01((now - t0) / duration);
-      const u = smootherstep(rawT);
-
-      let pos;
-      let zoom;
-      let pitch;
-      let bearing;
-
-      if (fromGlobe) {
-        // Rotate globe overhead first while still in space, then descend cleanly from above
-        const sPos = smootherstep(clamp01(rawT / 0.62));
-        pos = greatCirclePoint(startCenter, mem.coords, sPos);
-        zoom = z0 + (z1 - z0) * Math.pow(u, 1.42);
-        if (rawT < 0.64) {
-          pitch = p0 + (26 - p0) * smootherstep(rawT / 0.64);
-        } else {
-          pitch = 26 + (p1 - 26) * smootherstep((rawT - 0.64) / 0.36);
-        }
-        bearing = b0 + bDelta * smootherstep(clamp01((rawT - 0.22) / 0.78));
-      } else {
-        // Unified parabolic sky-arc: climb straight out of Valley A, traverse high above all peaks,
-        // center 100% over Valley B before final descent, then gently tilt gaze up to the horizon
-        const arch = Math.pow(Math.sin(Math.PI * u), 0.72);
-        const zBase = z0 + (z1 - z0) * u;
-        zoom = zBase * (1 - arch) + safeApex * arch;
-
-        const sPos = smootherstep(clamp01((rawT - 0.08) / 0.76));
-        pos = greatCirclePoint(startCenter, mem.coords, sPos);
-
-        if (rawT < 0.26) {
-          pitch = p0 + (pCruise - p0) * smootherstep(rawT / 0.26);
-        } else if (rawT < 0.72) {
-          pitch = pCruise;
-        } else {
-          pitch = pCruise + (p1 - pCruise) * smootherstep((rawT - 0.72) / 0.28);
-        }
-
-        bearing = b0 + bDelta * smootherstep(clamp01((rawT - 0.12) / 0.78));
-      }
-
-      this.programmatic = true;
-      this.map.jumpTo({
-        center: pos,
-        zoom,
-        pitch,
-        bearing,
-        padding: lerpPadding(pad0, pad1, u),
+    if (fromGlobe) {
+      // Already zoomed out in space: rotate the globe first, then descend cleanly onto Stop 1
+      const okRotate = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: z0,
+        pitch: 8,
+        bearing: 0,
+        padding: pad1,
+        duration: Math.round(4200 * speedMult),
+        easing: easeInOutSine,
       });
-      this.programmatic = false;
+      if (!okRotate) return;
 
-      if (!revealed && duration - (now - t0) <= 650) {
-        revealArrival();
-      }
+      const zoomInMs = Math.round(5800 * speedMult);
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 550));
+      const okIn = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: z1,
+        pitch: p1,
+        bearing: b1,
+        padding: pad1,
+        duration: zoomInMs,
+        easing: easeInOutCubic,
+      });
+      if (!okIn) return;
+    } else if (km < 3.5) {
+      // Immediate walking-distance neighbor in the same town/meadow:
+      // Gently step up to a neighborhood overlook, glide across, and settle back down
+      const cruiseZoom = Math.min(z0, z1, 13.4) - (km < 0.5 ? 0.85 : 1.35);
+      const midBearing = b0 + shortestDelta(b0, b1) * 0.5;
 
-      if (rawT < 1) {
-        this.flightRaf = requestAnimationFrame(stepFlight);
-      } else {
-        this.flightRaf = 0;
-        revealArrival();
-        this.syncPinVisibility();
-        this.startLocalOrbit(mem);
-      }
-    };
+      const okOut = await this.runCameraStage(token, {
+        center: startCenter,
+        zoom: cruiseZoom,
+        pitch: 30,
+        bearing: midBearing,
+        padding: pad1,
+        duration: Math.round(1650 * speedMult),
+        easing: easeInOutCubic,
+      });
+      if (!okOut) return;
 
-    this.flightRaf = requestAnimationFrame(stepFlight);
+      const okGlide = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: cruiseZoom,
+        pitch: 30,
+        bearing: midBearing,
+        padding: pad1,
+        duration: Math.round(1850 * speedMult),
+        easing: easeInOutSine,
+      });
+      if (!okGlide) return;
+
+      const zoomInMs = Math.round(1850 * speedMult);
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 450));
+      const okIn = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: z1,
+        pitch: p1,
+        bearing: b1,
+        padding: pad1,
+        duration: zoomInMs,
+        easing: easeInOutCubic,
+      });
+      if (!okIn) return;
+    } else if (km < 300) {
+      // Regional valley-to-valley walk:
+      // 1) Zoom straight out above the mountain range, 2) glide overhead at constant altitude, 3) zoom down in
+      const cruiseZoom = Math.max(5.3, Math.min(11.3, 12.65 - Math.log2(1 + km) * 0.92));
+      const cruisePitch = km > 60 ? 12 : 16;
+      const cruiseBearing = km > 45 ? 0 : b0 + shortestDelta(b0, b1) * 0.5;
+
+      const zoomOutMs = Math.round((2500 + Math.min(1400, Math.log2(1 + km) * 180)) * speedMult);
+      const glideMs = Math.round((2600 + Math.min(2200, (km / 300) * 2200)) * speedMult);
+      const zoomInMs = Math.round((2800 + Math.min(1500, Math.log2(1 + km) * 190)) * speedMult);
+
+      const okOut = await this.runCameraStage(token, {
+        center: startCenter,
+        zoom: cruiseZoom,
+        pitch: cruisePitch,
+        bearing: cruiseBearing,
+        padding: pad1,
+        duration: zoomOutMs,
+        easing: easeInOutCubic,
+      });
+      if (!okOut) return;
+
+      const okGlide = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: cruiseZoom,
+        pitch: cruisePitch,
+        bearing: cruiseBearing,
+        padding: pad1,
+        duration: glideMs,
+        easing: easeInOutSine,
+      });
+      if (!okGlide) return;
+
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 550));
+      const okIn = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: z1,
+        pitch: p1,
+        bearing: b1,
+        padding: pad1,
+        duration: zoomInMs,
+        easing: easeInOutCubic,
+      });
+      if (!okIn) return;
+    } else {
+      // Continental & Global transitions:
+      // Act 1: Pull straight out into space to reveal the sunlit 3D Earth (North-up).
+      // Act 2: Rotate the globe smoothly at constant orbital altitude & overhead gaze.
+      // Act 3: Descend straight down into the new landscape and lift gaze onto the horizon.
+      const globeCruiseZoom =
+        km >= 3500
+          ? minGlobeZ + 0.04
+          : km >= 1200
+            ? minGlobeZ + 0.52
+            : Math.max(minGlobeZ + 1.1, 3.25 - ((km - 300) / 900) * 0.6);
+      const cruisePitch = km >= 1200 ? 6 : 10;
+
+      const zoomOutMs = Math.round((5000 + Math.min(1600, (km / 6000) * 1600)) * speedMult);
+      const rotateMs = Math.round((4600 + Math.min(6800, (km / 18800) * 6800)) * speedMult);
+      const zoomInMs = Math.round((5400 + Math.min(1400, (km / 6000) * 1400)) * speedMult);
+
+      const okOut = await this.runCameraStage(token, {
+        center: startCenter,
+        zoom: globeCruiseZoom,
+        pitch: cruisePitch,
+        bearing: 0,
+        padding: pad1,
+        duration: zoomOutMs,
+        easing: easeInOutCubic,
+      });
+      if (!okOut) return;
+
+      const targetLng = startCenter[0] + shortestDelta(startCenter[0], mem.coords[0]);
+      const okRotate = await this.runCameraStage(token, {
+        center: [targetLng, mem.coords[1]],
+        zoom: globeCruiseZoom,
+        pitch: cruisePitch,
+        bearing: 0,
+        padding: pad1,
+        duration: rotateMs,
+        easing: easeInOutSine,
+      });
+      if (!okRotate) return;
+
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 600));
+      const okIn = await this.runCameraStage(token, {
+        center: mem.coords,
+        zoom: z1,
+        pitch: p1,
+        bearing: b1,
+        padding: pad1,
+        duration: zoomInMs,
+        easing: easeInOutCubic,
+      });
+      if (!okIn) return;
+    }
+
+    revealArrival();
+    this.syncPinVisibility();
+    this.startLocalOrbit(mem, token);
   }
 
-  // Gentle ridge-walk horizon gaze: slow, unhurried bearing sway
-  startLocalOrbit(mem) {
-    cancelAnimationFrame(this.orbitRaf);
+  // Serene native WebGL horizon drift while reading a memory (zero per-frame JS setBearing jitter)
+  startLocalOrbit(mem, token = this.flightToken) {
+    if (this.flightToken !== token || !this.map) return;
     const baseBearing = typeof mem?.bearing === 'number' ? mem.bearing : this.map.getBearing();
-    const t0 = performance.now();
-
-    const walkGaze = (now) => {
-      const sec = (now - t0) / 1000;
-      const sway = Math.sin(sec * 0.16) * 5.5;
-      this.programmatic = true;
-      this.map.setBearing(baseBearing + sway);
-      this.programmatic = false;
-      this.orbitRaf = requestAnimationFrame(walkGaze);
-    };
-    this.orbitRaf = requestAnimationFrame(walkGaze);
+    this.programmatic = true;
+    this.map.easeTo({
+      bearing: baseBearing + 4.5,
+      duration: 16000,
+      easing: (t) => t,
+      essential: true,
+    });
+    this.programmatic = false;
   }
 
   stopOrbit() {
     clearTimeout(this.earlyTimer);
-    cancelAnimationFrame(this.flightRaf);
-    cancelAnimationFrame(this.orbitRaf);
-    this.flightRaf = 0;
-    this.orbitRaf = 0;
+    if (this.stageCleanup) {
+      const fn = this.stageCleanup;
+      this.stageCleanup = null;
+      fn();
+    }
     this.map?.stop();
   }
 

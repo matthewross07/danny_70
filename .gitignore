@@ -1,2 +1,7 @@
 .DS_Store
 scripts/.geocache.json
+media/*/
+media/*.heic
+media/*.HEIC
+media/*.png
+media/*.PNG

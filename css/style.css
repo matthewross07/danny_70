@@ -610,7 +610,13 @@ body.cinema-mode:hover .cinema-exit,
   border-color: var(--terra);
   color: var(--terra);
 }
-.mc-dots { display: flex; gap: 6px; align-items: center; }
+.mc-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  max-width: 245px;
+}
 .mc-dot {
   width: 6px;
   height: 6px;
@@ -660,6 +666,12 @@ body.cinema-mode:hover .cinema-exit,
   font: 500 52px/0.68 var(--serif);
   color: rgba(184, 90, 50, 0.36);
   margin-bottom: 6px;
+}
+.memory-card.photo-only .mc-media {
+  margin-bottom: 18px;
+}
+.memory-card.photo-only .mc-stage {
+  height: clamp(250px, 37vh, 360px);
 }
 
 /* Terracotta Dwell Progress Thread */

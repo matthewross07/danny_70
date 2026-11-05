@@ -81,13 +81,14 @@ function preloadMemoryMedia(mem) {
 
 function computeDwellMs(mem) {
   const words = (mem.text || '').trim().split(/\s+/).filter(Boolean).length;
-  const readingMs = Math.max(7200, Math.min(13800, 4600 + words * 105));
+  const readingMs = words > 0 ? Math.max(7200, Math.min(13800, 4600 + words * 105)) : 6500;
   const media = mem.media || [];
   const video = media.find((m) => m.type === 'video');
   if (video && video.duration) {
     return Math.round((video.duration * 1000 + 1400) * currentPace().dwell);
   }
-  const galleryMs = media.length > 1 ? media.length * 4200 : 0;
+  const perSlideMs = media.length >= 9 ? 2500 : media.length >= 5 ? 3400 : 4200;
+  const galleryMs = media.length > 1 ? media.length * perSlideMs : 0;
   return Math.round(Math.max(readingMs, galleryMs) * currentPace().dwell);
 }
 
@@ -99,7 +100,7 @@ function renderHero() {
   $('#memory-count').textContent = memories.length;
   $('#sheet-link').href = data.sheetUrl;
   $('#hero-summary').textContent =
-    `${memories.length} trail stops and ${photoCount} photographs & videos across ${data.chapters.length} chapters—from Amarillo ballfields and San Juan elk camps to Haute-Loire and Ross, New Zealand.`;
+    `${memories.length} places and ${photoCount} photographs & videos across ${data.chapters.length} regions—circling the globe from Amarillo and the Caribbean to France, New Zealand, and home to the Colorado Rockies.`;
 
   $('#hero-chapters').innerHTML = data.chapters
     .map(
@@ -148,7 +149,7 @@ function renderDrawerList() {
       lastChap = m.chapter;
       const ch = state.chapters.get(m.chapter);
       if (ch) {
-        html.push(`<div class="drawer-chap-heading">Chapter ${esc(ch.roman)} · ${esc(ch.name)}</div>`);
+        html.push(`<div class="drawer-chap-heading">Region ${esc(ch.roman)} · ${esc(ch.name)}</div>`);
       }
     }
     const stopNum = String(state.memories.indexOf(m) + 1).padStart(2, '0');
@@ -156,12 +157,13 @@ function renderDrawerList() {
     const thumbSrc = firstMedia ? (firstMedia.type === 'video' ? firstMedia.poster : firstMedia.src) : null;
     const isActive = state.memories[state.index]?.id === m.id;
     const elevBadge = typeof m.elevFt === 'number' ? ` · ${m.elevFt.toLocaleString()} ft` : '';
+    const snipHtml = m.text ? `<p class="mem-row-snip">${esc(m.text)}</p>` : '';
     html.push(`
       <button class="mem-row${isActive ? ' active' : ''}" type="button" data-mem-id="${esc(m.id)}">
         <div>
           <p class="mem-row-place"><span class="mem-row-num">${stopNum}</span> ${esc(m.place)}${esc(elevBadge)}</p>
           <h3 class="mem-row-title">${esc(m.title)}</h3>
-          <p class="mem-row-snip">${esc(m.text)}</p>
+          ${snipHtml}
         </div>
         ${thumbSrc ? `<img class="mem-thumb" src="${esc(thumbSrc)}" alt="" loading="lazy">` : ''}
       </button>
@@ -174,7 +176,7 @@ function showChapterBanner(chapterId) {
   const ch = state.chapters.get(chapterId);
   if (!ch) return;
   const el = $('#chapter-banner');
-  $('#chapter-roman').textContent = `Chapter ${ch.roman}`;
+  $('#chapter-roman').textContent = `Region ${ch.roman}`;
   $('#chapter-name').textContent = ch.name;
   el.hidden = false;
   clearTimeout(state.chapterTimer);
@@ -190,7 +192,7 @@ function showChapterBanner(chapterId) {
 function renderMemoryCard(mem, idx) {
   const card = $('#memory-card');
   const ch = state.chapters.get(mem.chapter);
-  $('#mc-chapter').textContent = ch ? `Chapter ${ch.roman} · ${ch.name}` : 'Field Note';
+  $('#mc-chapter').textContent = ch ? `${ch.roman} · ${ch.name}` : 'Field Note';
   $('#mc-step').textContent = `STOP ${String(idx + 1).padStart(2, '0')} / ${state.memories.length}`;
   $('#mc-title').textContent = mem.title;
   $('#mc-place-text').textContent = mem.place;
@@ -239,16 +241,24 @@ function renderMemoryCard(mem, idx) {
     }
   }
 
-  // Story typography scaled cleanly by text length
+  // Story typography scaled cleanly by text length (or hidden cleanly for photo-only stops)
   const body = $('#mc-body');
   const paragraphs = (mem.text || '')
     .split(/\n+/)
     .map((p) => p.trim())
     .filter(Boolean);
-  const charLen = (mem.text || '').length;
-  body.className = 'mc-body ' + (charLen < 120 ? 'quote-lg' : charLen < 260 ? 'quote-md' : 'quote-sm');
-  body.innerHTML = paragraphs.map((p) => `<p>${esc(p)}</p>`).join('');
-  body.scrollTop = 0;
+  if (paragraphs.length === 0) {
+    body.hidden = true;
+    body.innerHTML = '';
+    card.classList.add('photo-only');
+  } else {
+    body.hidden = false;
+    card.classList.remove('photo-only');
+    const charLen = (mem.text || '').length;
+    body.className = 'mc-body ' + (charLen < 120 ? 'quote-lg' : charLen < 260 ? 'quote-md' : 'quote-sm');
+    body.innerHTML = paragraphs.map((p) => `<p>${esc(p)}</p>`).join('');
+    body.scrollTop = 0;
+  }
 
   $('#mc-progress-bar').style.width = '0%';
   card.hidden = false;

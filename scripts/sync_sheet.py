@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Syncs Danny Ross's 70th Birthday Memories from the Google Sheet + local Drive
-uploads (or direct Drive download fallback) + data/extra_memories.json, converts
-HEIC/PNG/JPEG/MOV files into web-ready media/, and writes data/memories.json.
+uploads (or direct Drive download fallback) + supplemental media + data/extra_memories.json,
+organizes the trail geographically by Place around the globe, and writes data/memories.json.
 
 Usage:
     python3 scripts/sync_sheet.py
@@ -11,7 +11,6 @@ Usage:
 import csv
 import io
 import json
-import os
 import re
 import subprocess
 import time
@@ -34,387 +33,407 @@ DATA_OUT = ROOT / "data" / "memories.json"
 EXTRA_IN = ROOT / "data" / "extra_memories.json"
 GEOCACHE_PATH = ROOT / "scripts" / ".geocache.json"
 
+# Purely Place-based geographic regions in a continuous West-to-East loop around the Earth,
+# beginning in Amarillo & the Texas Plains and returning home to the Colorado Front Range.
 CHAPTERS = [
-    {"id": "roots", "roman": "I", "name": "Roots & Rebel Years", "color": "#c96a3b"},
-    {"id": "debbie", "roman": "II", "name": "Debbie & Early Journeys", "color": "#d48c46"},
-    {"id": "front-range", "roman": "III", "name": "Colorado Home Base", "color": "#5c8a6e"},
-    {"id": "high-country", "roman": "IV", "name": "High Country & Campfires", "color": "#3f7a5c"},
-    {"id": "far-horizons", "roman": "V", "name": "Far Horizons", "color": "#4b7fa8"},
-    {"id": "seventy", "roman": "VI", "name": "Turning Seventy", "color": "#d99b38"},
+    {"id": "texas-plains", "roman": "I", "name": "Texas & the High Plains", "color": "#c96a3b"},
+    {"id": "caribbean", "roman": "II", "name": "Caribbean Coasts", "color": "#3d8b8c"},
+    {"id": "pennsylvania", "roman": "III", "name": "Pennsylvania Hills", "color": "#7a8446"},
+    {"id": "france", "roman": "IV", "name": "France & Europe", "color": "#b88238"},
+    {"id": "pacific", "roman": "V", "name": "Pacific Horizons", "color": "#46799e"},
+    {"id": "high-country", "roman": "VI", "name": "Red Rock & High Country", "color": "#3f7a5c"},
+    {"id": "front-range", "roman": "VII", "name": "Front Range & Foothills", "color": "#c88a32"},
 ]
 
-# Curated location & narrative arc metadata keyed by 1-based sheet row index.
-# New rows added to the sheet after row 37 are automatically geocoded & appended!
+#Supplemental photos sent outside the Google Form that pair onto existing Sheet rows:
+SUPPLEMENTAL_ROW_MEDIA = {
+    25: ["media/m25_01.jpg"],
+    29: ["media/m29_01.jpg", "media/m29_02.jpg", "media/m29_03.jpg", "media/m29_04.jpg"],
+    34: ["media/m34_02.jpg", "media/m34_03.jpg"],
+    36: ["media/m36_01.jpg", "media/m36_02.jpg", "media/m36_03.jpg"],
+}
+
+# Place-first geographic curation keyed by 1-based sheet row index.
+# Titles strictly name the authentic Place (no editorialized AI headlines).
 CURATED = {
-    26: {
-        "order": 1,
-        "chapter": "roots",
-        "title": "Aunt Elsie & Uncle Duane’s Farm",
-        "place": "Near Latrobe, Pennsylvania",
-        "coords": [-79.3840, 40.3173],
-        "zoom": 13.8,
-        "pitch": 67,
-        "bearing": 122,
-    },
-    30: {
-        "order": 2,
-        "chapter": "roots",
-        "title": "Ballfields of Amarillo",
-        "place": "Amarillo, Texas",
-        "coords": [-101.9044, 35.1660],
-        "zoom": 14.7,
-        "pitch": 67,
-        "bearing": 28,
-    },
+    # I · Texas & the High Plains (8 stops)
     24: {
-        "order": 3,
-        "chapter": "roots",
-        "title": "Record Pass for the Tascosa Rebels",
-        "place": "Dick Bivins Stadium · Amarillo, TX",
+        "order": 1,
+        "chapter": "texas-plains",
+        "title": "Dick Bivins Stadium",
+        "place": "Amarillo, Texas",
         "coords": [-101.8010, 35.2032],
-        "zoom": 15.6,
-        "pitch": 67,
+        "zoom": 15.5,
+        "pitch": 64,
         "bearing": -26,
     },
     27: {
-        "order": 4,
-        "chapter": "roots",
-        "title": "Quarterback & Running Back",
-        "place": "Tascosa High School · Amarillo, TX",
+        "order": 2,
+        "chapter": "texas-plains",
+        "title": "Tascosa High School",
+        "place": "Amarillo, Texas",
         "coords": [-101.8792, 35.1938],
-        "zoom": 15.5,
-        "pitch": 67,
+        "zoom": 15.4,
+        "pitch": 64,
         "bearing": 22,
     },
     2: {
-        "order": 5,
-        "chapter": "roots",
-        "title": "Big Rebel Shoes to Fill",
-        "place": "Tascosa High School · Amarillo, TX",
+        "order": 3,
+        "chapter": "texas-plains",
+        "title": "Tascosa High School",
+        "place": "Amarillo, Texas",
         "coords": [-101.8809, 35.1946],
-        "zoom": 15.4,
-        "pitch": 67,
+        "zoom": 15.3,
+        "pitch": 64,
         "bearing": 74,
     },
+    30: {
+        "order": 4,
+        "chapter": "texas-plains",
+        "title": "Amarillo Ballfields",
+        "place": "Amarillo, Texas",
+        "coords": [-101.9044, 35.1660],
+        "zoom": 14.6,
+        "pitch": 64,
+        "bearing": 28,
+    },
     1: {
-        "order": 6,
-        "chapter": "roots",
-        "title": "Campfire Showers & Fleetwood Walks",
-        "place": "Fleetwood · Amarillo, TX",
+        "order": 5,
+        "chapter": "texas-plains",
+        "title": "Fleetwood Park",
+        "place": "Amarillo, Texas",
         "coords": [-101.8784, 35.1737],
-        "zoom": 14.7,
-        "pitch": 67,
+        "zoom": 14.6,
+        "pitch": 64,
         "bearing": -22,
         "clean_suffix": "I will work on pictures…",
     },
     25: {
-        "order": 7,
-        "chapter": "debbie",
-        "title": "The Night He Asked Debbie",
-        "place": "Jeanne & David’s Home · Amarillo, TX",
+        "order": 6,
+        "chapter": "texas-plains",
+        "title": "Jeanne & David’s Home",
+        "place": "Amarillo, Texas",
         "coords": [-101.8625, 35.1845],
         "zoom": 14.7,
-        "pitch": 67,
+        "pitch": 64,
         "bearing": 35,
     },
     20: {
-        "order": 8,
-        "chapter": "debbie",
-        "title": "Wedding Getaway in the Datsun B210",
-        "place": "Tucumcari, New Mexico",
+        "order": 7,
+        "chapter": "texas-plains",
+        "title": "Tucumcari",
+        "place": "Route 66 · New Mexico",
         "coords": [-103.7231, 35.1537],
         "zoom": 13.9,
-        "pitch": 68,
+        "pitch": 64,
         "bearing": 132,
-    },
-    19: {
-        "order": 9,
-        "chapter": "debbie",
-        "title": "Honeymoon Cabins by the Water",
-        "place": "Vallecito Lake, Colorado",
-        "coords": [-107.5430, 37.4032],
-        "zoom": 13.4,
-        "pitch": 65,
-        "bearing": 12,
-    },
-    21: {
-        "order": 10,
-        "chapter": "debbie",
-        "title": "General Patton at the ’87 Reunion",
-        "place": "Laurel Highlands · Southern PA",
-        "coords": [-79.0800, 40.0150],
-        "zoom": 13.2,
-        "pitch": 67,
-        "bearing": -32,
-    },
-    10: {
-        "order": 11,
-        "chapter": "front-range",
-        "title": "First Home Beyond Amarillo",
-        "place": "Half Turn Rd · Colorado Springs, CO",
-        "coords": [-104.7565, 38.8860],
-        "zoom": 14.2,
-        "pitch": 68,
-        "bearing": -96,
-    },
-    32: {
-        "order": 12,
-        "chapter": "front-range",
-        "title": "Laughter & Gratitude From the Start",
-        "place": "Colorado Springs, Colorado",
-        "coords": [-104.7626, 38.9549],
-        "zoom": 13.8,
-        "pitch": 68,
-        "bearing": -104,
-    },
-    8: {
-        "order": 13,
-        "chapter": "front-range",
-        "title": "Open Doors on Pine Vista Place",
-        "place": "18245 Pine Vista Pl · Monument, CO",
-        "coords": [-104.7563, 39.0954],
-        "zoom": 14.4,
-        "pitch": 68,
-        "bearing": -102,
-    },
-    28: {
-        "order": 14,
-        "chapter": "front-range",
-        "title": "March 2020 Quarantine Dispatch",
-        "place": "Pine Vista Pl · Monument, CO",
-        "coords": [-104.7549, 39.0961],
-        "zoom": 14.6,
-        "pitch": 68,
-        "bearing": -88,
-    },
-    22: {
-        "order": 15,
-        "chapter": "front-range",
-        "title": "Golden Aspens With His Boys",
-        "place": "Cripple Creek, Colorado",
-        "coords": [-105.1783, 38.7467],
-        "zoom": 13.6,
-        "pitch": 66,
-        "bearing": 48,
-    },
-    9: {
-        "order": 16,
-        "chapter": "front-range",
-        "title": "Aggies vs. Buffs at Mile High",
-        "place": "Empower Field · Denver, CO",
-        "coords": [-105.0192, 39.7440],
-        "zoom": 15.3,
-        "pitch": 67,
-        "bearing": -85,
-    },
-    23: {
-        "order": 17,
-        "chapter": "high-country",
-        "title": "Carving Turns Together",
-        "place": "Near Breckenridge, Colorado",
-        "coords": [-106.0667, 39.4802],
-        "zoom": 13.5,
-        "pitch": 65,
-        "bearing": -102,
-    },
-    17: {
-        "order": 18,
-        "chapter": "high-country",
-        "title": "Grooving at Taylor’s Wedding",
-        "place": "Breckenridge, Colorado",
-        "coords": [-106.0465, 39.4829],
-        "zoom": 14.1,
-        "pitch": 65,
-        "bearing": -96,
-    },
-    37: {
-        "order": 19,
-        "chapter": "high-country",
-        "title": "Officiating in the Mountains",
-        "place": "BlueSky · Breckenridge, CO",
-        "coords": [-106.0522, 39.4765],
-        "zoom": 14.3,
-        "pitch": 65,
-        "bearing": -82,
     },
     18: {
-        "order": 20,
-        "chapter": "high-country",
-        "title": "Wedding Sightings in Austin",
-        "place": "Four Seasons · Austin, TX",
+        "order": 8,
+        "chapter": "texas-plains",
+        "title": "Four Seasons Hotel",
+        "place": "Austin, Texas",
         "coords": [-97.7419, 30.2616],
-        "zoom": 15.4,
-        "pitch": 67,
+        "zoom": 15.3,
+        "pitch": 64,
         "bearing": -58,
     },
-    33: {
-        "order": 21,
-        "chapter": "high-country",
-        "title": "Scouting Camp With Jim",
-        "place": "Trujillo Meadows, Colorado",
-        "coords": [-106.4495, 37.0466],
-        "zoom": 13.7,
-        "pitch": 66,
-        "bearing": -38,
-    },
-    36: {
-        "order": 22,
-        "chapter": "high-country",
-        "title": "2015 Elk Hunt",
-        "place": "San Juan Wilderness, Colorado",
-        "coords": [-106.6234, 37.3385],
-        "zoom": 13.3,
-        "pitch": 65,
-        "bearing": 35,
-    },
-    7: {
-        "order": 23,
-        "chapter": "high-country",
-        "title": "Two Classics From Platoro",
-        "place": "Platoro, Colorado",
-        "coords": [-106.5328, 37.3520],
-        "zoom": 13.8,
-        "pitch": 65,
-        "bearing": -52,
-    },
-    35: {
-        "order": 24,
-        "chapter": "high-country",
-        "title": "One Last Hunt for Jim",
-        "place": "Mix Lake Campground · Platoro, CO",
-        "coords": [-106.5427, 37.3578],
-        "zoom": 13.9,
-        "pitch": 65,
-        "bearing": 24,
-    },
-    34: {
-        "order": 25,
-        "chapter": "high-country",
-        "title": "Planning the Next Elk Hunt",
-        "place": "Mountain Cabin · Near Telluride, CO",
-        "coords": [-108.0136, 37.9182],
-        "zoom": 13.4,
-        "pitch": 65,
-        "bearing": 132,
-    },
-    4: {
-        "order": 26,
-        "chapter": "high-country",
-        "title": "Riding Horseback Under the Peaks",
-        "place": "Telluride, Colorado",
-        "coords": [-108.0528, 38.0753],
-        "zoom": 13.3,
-        "pitch": 65,
-        "bearing": 158,
-    },
-    6: {
-        "order": 27,
-        "chapter": "high-country",
-        "title": "Binoculars Down the Valley",
-        "place": "Outside Ouray, Colorado",
-        "coords": [-107.6707, 38.0228],
-        "zoom": 13.4,
-        "pitch": 64,
-        "bearing": 172,
-    },
-    13: {
-        "order": 28,
-        "chapter": "high-country",
-        "title": "Red Rock & Soils Visit",
-        "place": "Mesa Arch · Moab, Utah",
-        "coords": [-109.8658, 38.3885],
-        "zoom": 14.1,
-        "pitch": 68,
-        "bearing": 112,
-    },
+    # II · Caribbean Coasts (2 stops)
     11: {
-        "order": 29,
-        "chapter": "far-horizons",
-        "title": "Sun & Graduation in Cancún",
-        "place": "Isla Mujeres · Cancún, Mexico",
+        "order": 9,
+        "chapter": "caribbean",
+        "title": "Isla Mujeres",
+        "place": "Cancún, Mexico",
         "coords": [-86.7527, 21.2146],
         "zoom": 13.9,
-        "pitch": 67,
+        "pitch": 64,
         "bearing": -32,
     },
     29: {
-        "order": 30,
-        "chapter": "far-horizons",
-        "title": "Another Trip Around the Sun",
-        "place": "Pelican Resort · Sint Maarten",
+        "order": 10,
+        "chapter": "caribbean",
+        "title": "Pelican Resort",
+        "place": "Simpson Bay, Sint Maarten",
         "coords": [-63.0946, 18.0302],
         "zoom": 14.1,
-        "pitch": 67,
+        "pitch": 64,
         "bearing": 48,
     },
-    31: {
-        "order": 31,
-        "chapter": "far-horizons",
-        "title": "Geo & Danny on Kauaʻi",
-        "place": "Pono Kai · Kapaʻa, Hawaii",
-        "coords": [-159.3189, 22.0731],
-        "zoom": 13.8,
-        "pitch": 67,
-        "bearing": -72,
+    # III · Pennsylvania Hills (2 stops)
+    21: {
+        "order": 11,
+        "chapter": "pennsylvania",
+        "title": "Laurel Highlands",
+        "place": "Southern Pennsylvania",
+        "coords": [-79.0800, 40.0150],
+        "zoom": 13.3,
+        "pitch": 64,
+        "bearing": -32,
     },
+    26: {
+        "order": 12,
+        "chapter": "pennsylvania",
+        "title": "Aunt Elsie & Uncle Duane’s Farm",
+        "place": "Near Latrobe, Pennsylvania",
+        "coords": [-79.3840, 40.3173],
+        "zoom": 13.8,
+        "pitch": 64,
+        "bearing": 122,
+    },
+    # IV · France & Europe (4+ stops)
     14: {
-        "order": 32,
-        "chapter": "far-horizons",
-        "title": "First Trip to France · 2011",
-        "place": "Notre-Dame de Paris · France",
+        "order": 13,
+        "chapter": "france",
+        "title": "Notre-Dame de Paris",
+        "place": "Paris, France",
         "coords": [2.3499, 48.8530],
-        "zoom": 15.6,
-        "pitch": 67,
+        "zoom": 15.5,
+        "pitch": 64,
         "bearing": -36,
     },
-    5: {
-        "order": 33,
-        "chapter": "far-horizons",
-        "title": "The French ‘Entrée’ Surprise",
-        "place": "Crespinhac · Haute-Loire, France",
-        "coords": [4.0096, 45.2502],
-        "zoom": 14.3,
-        "pitch": 67,
-        "bearing": 28,
-    },
     15: {
-        "order": 34,
-        "chapter": "far-horizons",
-        "title": "First Big Feast Chez Provost",
-        "place": "Crespinhac · Solignac-sous-Roche, France",
+        "order": 14,
+        "chapter": "france",
+        "title": "Chez Provost · Crespinhac",
+        "place": "Solignac-sous-Roche, France",
         "coords": [4.0088, 45.2519],
-        "zoom": 14.5,
-        "pitch": 67,
+        "zoom": 14.4,
+        "pitch": 64,
         "bearing": 68,
     },
+    5: {
+        "order": 15,
+        "chapter": "france",
+        "title": "Crespinhac",
+        "place": "Haute-Loire, France",
+        "coords": [4.0096, 45.2502],
+        "zoom": 14.2,
+        "pitch": 64,
+        "bearing": 28,
+    },
     16: {
-        "order": 35,
-        "chapter": "far-horizons",
-        "title": "Grapes, Wine & French Cherries",
-        "place": "Domaine Guion · Provence, France",
+        "order": 16,
+        "chapter": "france",
+        "title": "Domaine Guion",
+        "place": "Provence, France",
         "coords": [5.3947, 43.7371],
         "zoom": 14.0,
-        "pitch": 67,
+        "pitch": 64,
         "bearing": 12,
     },
+    # V · Pacific Horizons (2 stops)
     12: {
-        "order": 36,
-        "chapter": "far-horizons",
-        "title": "Reunited in Ross, New Zealand",
-        "place": "Ross · West Coast, New Zealand",
+        "order": 17,
+        "chapter": "pacific",
+        "title": "Ross",
+        "place": "West Coast, New Zealand",
         "coords": [170.8174, -42.8992],
         "zoom": 13.3,
-        "pitch": 66,
+        "pitch": 63,
         "bearing": 132,
     },
-    3: {
-        "order": 37,
-        "chapter": "seventy",
-        "title": "Summit on His 70th Birthday",
-        "place": "Mount Morrison · Colorado",
-        "coords": [-105.2200, 39.6692],
+    31: {
+        "order": 18,
+        "chapter": "pacific",
+        "title": "Pono Kai · Kapaʻa",
+        "place": "Kauaʻi, Hawaiʻi",
+        "coords": [-159.3189, 22.0731],
+        "zoom": 13.8,
+        "pitch": 64,
+        "bearing": -72,
+    },
+    # VI · Red Rock & High Country (14 stops, including extra_seanor=23, extra_ryan=25)
+    13: {
+        "order": 19,
+        "chapter": "high-country",
+        "title": "Mesa Arch",
+        "place": "Canyonlands · Moab, Utah",
+        "coords": [-109.8658, 38.3885],
         "zoom": 14.1,
-        "pitch": 69,
+        "pitch": 64,
+        "bearing": 112,
+    },
+    34: {
+        "order": 20,
+        "chapter": "high-country",
+        "title": "Mountain Cabin",
+        "place": "Near Telluride, Colorado",
+        "coords": [-108.0136, 37.9182],
+        "zoom": 13.4,
+        "pitch": 63,
+        "bearing": 132,
+    },
+    4: {
+        "order": 21,
+        "chapter": "high-country",
+        "title": "Telluride Valley",
+        "place": "Telluride, Colorado",
+        "coords": [-108.0528, 38.0753],
+        "zoom": 13.3,
+        "pitch": 63,
+        "bearing": 158,
+    },
+    6: {
+        "order": 22,
+        "chapter": "high-country",
+        "title": "Outside Ouray",
+        "place": "San Juan Mountains, Colorado",
+        "coords": [-107.6707, 38.0228],
+        "zoom": 13.4,
+        "pitch": 62,
+        "bearing": 172,
+    },
+    # order 23 -> extra_seanor (Alpine Ridge Outside Ouray)
+    19: {
+        "order": 24,
+        "chapter": "high-country",
+        "title": "Vallecito Lake",
+        "place": "Bayfield, Colorado",
+        "coords": [-107.5430, 37.4032],
+        "zoom": 13.4,
+        "pitch": 63,
+        "bearing": 12,
+    },
+    # order 25 -> extra_ryan (Colorado Backcountry)
+    36: {
+        "order": 26,
+        "chapter": "high-country",
+        "title": "San Juan Wilderness",
+        "place": "Conejos County, Colorado",
+        "coords": [-106.6234, 37.3385],
+        "zoom": 13.3,
+        "pitch": 63,
+        "bearing": 35,
+    },
+    35: {
+        "order": 27,
+        "chapter": "high-country",
+        "title": "Mix Lake Campground",
+        "place": "Platoro, Colorado",
+        "coords": [-106.5427, 37.3578],
+        "zoom": 13.9,
+        "pitch": 63,
+        "bearing": 24,
+    },
+    7: {
+        "order": 28,
+        "chapter": "high-country",
+        "title": "Platoro",
+        "place": "Conejos River Valley, Colorado",
+        "coords": [-106.5328, 37.3520],
+        "zoom": 13.8,
+        "pitch": 63,
+        "bearing": -52,
+    },
+    33: {
+        "order": 29,
+        "chapter": "high-country",
+        "title": "Trujillo Meadows",
+        "place": "Cumbres Pass, Colorado",
+        "coords": [-106.4495, 37.0466],
+        "zoom": 13.7,
+        "pitch": 63,
+        "bearing": -38,
+    },
+    23: {
+        "order": 30,
+        "chapter": "high-country",
+        "title": "Tenmile Range",
+        "place": "Near Breckenridge, Colorado",
+        "coords": [-106.0667, 39.4802],
+        "zoom": 13.5,
+        "pitch": 63,
+        "bearing": -102,
+    },
+    37: {
+        "order": 31,
+        "chapter": "high-country",
+        "title": "BlueSky Breckenridge",
+        "place": "Breckenridge, Colorado",
+        "coords": [-106.0522, 39.4765],
+        "zoom": 14.3,
+        "pitch": 63,
+        "bearing": -82,
+    },
+    17: {
+        "order": 32,
+        "chapter": "high-country",
+        "title": "Breckenridge",
+        "place": "Summit County, Colorado",
+        "coords": [-106.0465, 39.4829],
+        "zoom": 14.1,
+        "pitch": 63,
+        "bearing": -96,
+    },
+    # VII · Front Range & Foothills (7 stops, culminating on Mount Morrison!)
+    22: {
+        "order": 33,
+        "chapter": "front-range",
+        "title": "Cripple Creek",
+        "place": "Teller County, Colorado",
+        "coords": [-105.1783, 38.7467],
+        "zoom": 13.6,
+        "pitch": 64,
+        "bearing": 48,
+    },
+    10: {
+        "order": 34,
+        "chapter": "front-range",
+        "title": "Half Turn Road",
+        "place": "Colorado Springs, Colorado",
+        "coords": [-104.7565, 38.8860],
+        "zoom": 14.2,
+        "pitch": 64,
+        "bearing": -96,
+    },
+    32: {
+        "order": 35,
+        "chapter": "front-range",
+        "title": "Colorado Springs",
+        "place": "El Paso County, Colorado",
+        "coords": [-104.7626, 38.9549],
+        "zoom": 13.8,
+        "pitch": 64,
+        "bearing": -104,
+    },
+    8: {
+        "order": 36,
+        "chapter": "front-range",
+        "title": "18245 Pine Vista Place",
+        "place": "Monument, Colorado",
+        "coords": [-104.7563, 39.0954],
+        "zoom": 14.4,
+        "pitch": 64,
+        "bearing": -102,
+    },
+    28: {
+        "order": 37,
+        "chapter": "front-range",
+        "title": "Pine Vista Place",
+        "place": "Monument, Colorado",
+        "coords": [-104.7549, 39.0961],
+        "zoom": 14.6,
+        "pitch": 64,
+        "bearing": -88,
+    },
+    9: {
+        "order": 38,
+        "chapter": "front-range",
+        "title": "Empower Field at Mile High",
+        "place": "Denver, Colorado",
+        "coords": [-105.0192, 39.7440],
+        "zoom": 15.2,
+        "pitch": 64,
+        "bearing": -85,
+    },
+    3: {
+        "order": 39,
+        "chapter": "front-range",
+        "title": "Mount Morrison",
+        "place": "Morrison, Colorado",
+        "coords": [-105.2200, 39.6692],
+        "zoom": 14.0,
+        "pitch": 64,
         "bearing": -48,
     },
 }
@@ -484,13 +503,21 @@ def get_video_dims(path: Path):
     return int(st["width"]), int(st["height"]), round(dur, 1)
 
 
+def enrich_media_entry(item: dict):
+    rel = item["src"]
+    p = ROOT / rel
+    if item.get("type") == "image" and p.exists() and ("width" not in item or "height" not in item):
+        w, h = get_image_dims(p)
+        return {**item, "width": w, "height": h}
+    return item
+
+
 def process_media_item(row_idx: int, item_num: int, fid: str, local_index: dict):
     MEDIA_DIR.mkdir(parents=True, exist_ok=True)
     src = local_index.get(fid)
     temp_dl = None
 
     if src is None:
-        # Fallback: download directly from public Drive link if not synced locally yet
         dl_url = f"https://drive.google.com/uc?export=download&id={fid}"
         temp_dl = Path(f"/tmp/danny_dl_{fid}")
         if not temp_dl.exists():
@@ -559,8 +586,6 @@ def process_media_item(row_idx: int, item_num: int, fid: str, local_index: dict)
             "duration": dur,
         }
 
-    # Image asset (.jpg, .jpeg, .png, .heic, .webp)
-    # Clean out iOS Photos screenshot chrome on specific screenshot uploads
     SCREENSHOT_CROPS = {
         "m24_01": "iw:ih*0.705:0:ih*0.200",
         "m27_01": "iw:ih*0.610:0:ih*0.194",
@@ -618,8 +643,8 @@ def resolve_new_location(raw_loc: str, geocache: dict):
     loc = raw_loc.strip()
     if not loc:
         return {
-            "title": "A Shared Memory",
-            "place": "Amarillo, Texas",
+            "title": "Amarillo",
+            "place": "Texas",
             "coords": [-101.8313, 35.2220],
         }
     if loc in geocache:
@@ -661,13 +686,32 @@ def resolve_new_location(raw_loc: str, geocache: dict):
     hits = json.loads(urllib.request.urlopen(req, timeout=10).read().decode())
     if hits:
         lat, lon = float(hits[0]["lat"]), float(hits[0]["lon"])
-        disp = ", ".join(hits[0]["display_name"].split(",")[:2]).strip()
-        res = {"title": disp, "place": disp, "coords": [lon, lat]}
+        parts = [p.strip() for p in hits[0]["display_name"].split(",")]
+        title = parts[0]
+        place = ", ".join(parts[1:3]) if len(parts) > 1 else title
+        res = {"title": title, "place": place, "coords": [lon, lat]}
     else:
         res = {"title": query_text[:48], "place": query_text[:60], "coords": [-104.7563, 39.0954]}
     geocache[loc] = res
     save_geocache(geocache)
     return res
+
+
+def classify_region(coords):
+    lon, lat = coords
+    if -20 <= lon <= 30 and lat >= 35:
+        return "france"
+    if lon > 100 or lon < -130:
+        return "pacific"
+    if lat < 27 and -95 <= lon <= -55:
+        return "caribbean"
+    if -85 <= lon <= -73 and 38 <= lat <= 43:
+        return "pennsylvania"
+    if -104.2 <= lon <= -93 and lat <= 37:
+        return "texas-plains"
+    if -111.5 <= lon <= -105.5 and 36 <= lat <= 41:
+        return "high-country"
+    return "front-range"
 
 
 def main():
@@ -701,8 +745,8 @@ def main():
                 "title": cur["title"],
                 "place": cur["place"],
                 "coords": cur["coords"],
-                "zoom": cur.get("zoom", 14.3),
-                "pitch": cur.get("pitch", 74),
+                "zoom": cur.get("zoom", 14.1),
+                "pitch": cur.get("pitch", 64),
                 "bearing": cur.get("bearing", 0),
             }
         else:
@@ -710,12 +754,12 @@ def main():
             text = raw_text
             meta = {
                 "order": 100 + idx,
-                "chapter": "seventy",
+                "chapter": classify_region(geo["coords"]),
                 "title": geo["title"],
                 "place": geo["place"],
                 "coords": geo["coords"],
-                "zoom": 14.3,
-                "pitch": 74,
+                "zoom": 14.1,
+                "pitch": 64,
                 "bearing": (idx * 37) % 360 - 180,
             }
 
@@ -723,6 +767,12 @@ def main():
         media_items = []
         for m_i, fid in enumerate(fids, start=1):
             media_items.append(process_media_item(idx, m_i, fid, local_index))
+
+        for sup_rel in SUPPLEMENTAL_ROW_MEDIA.get(idx, []):
+            sup_path = ROOT / sup_rel
+            if sup_path.exists():
+                w, h = get_image_dims(sup_path)
+                media_items.append({"type": "image", "src": sup_rel, "width": w, "height": h})
 
         memories.append(
             {
@@ -736,25 +786,26 @@ def main():
             }
         )
 
-    # Merge any manual memories from random texts/emails in data/extra_memories.json
+    # Merge any manual memories from texts/emails/folders in data/extra_memories.json
     if EXTRA_IN.exists():
         extras = json.loads(EXTRA_IN.read_text())
         for ex_i, ex in enumerate(extras, start=1):
+            ex_media = [enrich_media_entry(m) for m in ex.get("media", [])]
             memories.append(
                 {
                     "id": ex.get("id", f"extra_{ex_i:02d}"),
                     "row": 1000 + ex_i,
                     "submittedAt": ex.get("submittedAt", ""),
                     "order": ex.get("order", 900 + ex_i),
-                    "chapter": ex.get("chapter", "seventy"),
+                    "chapter": ex.get("chapter", classify_region(ex["coords"])),
                     "title": ex["title"],
                     "place": ex["place"],
                     "coords": ex["coords"],
                     "zoom": ex.get("zoom", 13.8),
-                    "pitch": ex.get("pitch", 62),
+                    "pitch": ex.get("pitch", 63),
                     "bearing": ex.get("bearing", 0),
-                    "text": ex["text"],
-                    "media": ex.get("media", []),
+                    "text": ex.get("text", ""),
+                    "media": ex_media,
                 }
             )
 
