@@ -39,7 +39,7 @@ CHAPTERS = [
     {"id": "texas-plains", "roman": "I", "name": "Texas & the High Plains", "color": "#c96a3b"},
     {"id": "caribbean", "roman": "II", "name": "Caribbean Coasts", "color": "#3d8b8c"},
     {"id": "pennsylvania", "roman": "III", "name": "Pennsylvania Hills", "color": "#7a8446"},
-    {"id": "france", "roman": "IV", "name": "France & Europe", "color": "#b88238"},
+    {"id": "france", "roman": "IV", "name": "France & Italy", "color": "#b88238"},
     {"id": "pacific", "roman": "V", "name": "Pacific Horizons", "color": "#46799e"},
     {"id": "high-country", "roman": "VI", "name": "Red Rock & High Country", "color": "#3f7a5c"},
     {"id": "front-range", "roman": "VII", "name": "Front Range & Foothills", "color": "#c88a32"},
@@ -180,9 +180,10 @@ CURATED = {
         "pitch": 64,
         "bearing": 122,
     },
-    # IV · France & Europe (4+ stops)
+    # IV · France & Italy (14 stops across Sheet + extra_memories.json)
+    # orders 13..15 -> Mont-Saint-Michel, Omaha Beach, Étretat
     14: {
-        "order": 13,
+        "order": 16,
         "chapter": "france",
         "title": "Notre-Dame de Paris",
         "place": "Paris, France",
@@ -191,8 +192,9 @@ CURATED = {
         "pitch": 64,
         "bearing": -36,
     },
+    # orders 17..18 -> Chalencon, Le Cros · Tiranges
     15: {
-        "order": 14,
+        "order": 19,
         "chapter": "france",
         "title": "Chez Provost · Crespinhac",
         "place": "Solignac-sous-Roche, France",
@@ -202,7 +204,7 @@ CURATED = {
         "bearing": 68,
     },
     5: {
-        "order": 15,
+        "order": 20,
         "chapter": "france",
         "title": "Crespinhac",
         "place": "Haute-Loire, France",
@@ -212,7 +214,7 @@ CURATED = {
         "bearing": 28,
     },
     16: {
-        "order": 16,
+        "order": 21,
         "chapter": "france",
         "title": "Domaine Guion",
         "place": "Provence, France",
@@ -221,9 +223,10 @@ CURATED = {
         "pitch": 64,
         "bearing": 12,
     },
+    # orders 22..26 -> Saint-Cyr-sur-Mer, Chamonix, Venice, Florence, Rome
     # V · Pacific Horizons (2 stops)
     12: {
-        "order": 17,
+        "order": 27,
         "chapter": "pacific",
         "title": "Ross",
         "place": "West Coast, New Zealand",
@@ -233,7 +236,7 @@ CURATED = {
         "bearing": 132,
     },
     31: {
-        "order": 18,
+        "order": 28,
         "chapter": "pacific",
         "title": "Pono Kai · Kapaʻa",
         "place": "Kauaʻi, Hawaiʻi",
@@ -242,9 +245,9 @@ CURATED = {
         "pitch": 64,
         "bearing": -72,
     },
-    # VI · Red Rock & High Country (14 stops, including extra_seanor=23, extra_ryan=25)
+    # VI · Red Rock & High Country (14 stops, including extra_seanor=33, extra_ryan=35)
     13: {
-        "order": 19,
+        "order": 29,
         "chapter": "high-country",
         "title": "Mesa Arch",
         "place": "Canyonlands · Moab, Utah",
@@ -254,7 +257,7 @@ CURATED = {
         "bearing": 112,
     },
     34: {
-        "order": 20,
+        "order": 30,
         "chapter": "high-country",
         "title": "Mountain Cabin",
         "place": "Near Telluride, Colorado",
@@ -264,7 +267,7 @@ CURATED = {
         "bearing": 132,
     },
     4: {
-        "order": 21,
+        "order": 31,
         "chapter": "high-country",
         "title": "Telluride Valley",
         "place": "Telluride, Colorado",
@@ -274,7 +277,7 @@ CURATED = {
         "bearing": 158,
     },
     6: {
-        "order": 22,
+        "order": 32,
         "chapter": "high-country",
         "title": "Outside Ouray",
         "place": "San Juan Mountains, Colorado",
@@ -283,9 +286,9 @@ CURATED = {
         "pitch": 62,
         "bearing": 172,
     },
-    # order 23 -> extra_seanor (Alpine Ridge Outside Ouray)
+    # order 33 -> extra_seanor (Alpine Ridge Outside Ouray)
     19: {
-        "order": 24,
+        "order": 34,
         "chapter": "high-country",
         "title": "Vallecito Lake",
         "place": "Bayfield, Colorado",
@@ -294,9 +297,9 @@ CURATED = {
         "pitch": 63,
         "bearing": 12,
     },
-    # order 25 -> extra_ryan (Colorado Backcountry)
+    # order 35 -> extra_ryan (Colorado Backcountry)
     36: {
-        "order": 26,
+        "order": 36,
         "chapter": "high-country",
         "title": "San Juan Wilderness",
         "place": "Conejos County, Colorado",
@@ -306,7 +309,7 @@ CURATED = {
         "bearing": 35,
     },
     35: {
-        "order": 27,
+        "order": 37,
         "chapter": "high-country",
         "title": "Mix Lake Campground",
         "place": "Platoro, Colorado",
@@ -316,7 +319,7 @@ CURATED = {
         "bearing": 24,
     },
     7: {
-        "order": 28,
+        "order": 38,
         "chapter": "high-country",
         "title": "Platoro",
         "place": "Conejos River Valley, Colorado",
@@ -326,7 +329,7 @@ CURATED = {
         "bearing": -52,
     },
     33: {
-        "order": 29,
+        "order": 39,
         "chapter": "high-country",
         "title": "Trujillo Meadows",
         "place": "Cumbres Pass, Colorado",
@@ -336,7 +339,7 @@ CURATED = {
         "bearing": -38,
     },
     23: {
-        "order": 30,
+        "order": 40,
         "chapter": "high-country",
         "title": "Tenmile Range",
         "place": "Near Breckenridge, Colorado",
@@ -346,7 +349,7 @@ CURATED = {
         "bearing": -102,
     },
     37: {
-        "order": 31,
+        "order": 41,
         "chapter": "high-country",
         "title": "BlueSky Breckenridge",
         "place": "Breckenridge, Colorado",
@@ -356,7 +359,7 @@ CURATED = {
         "bearing": -82,
     },
     17: {
-        "order": 32,
+        "order": 42,
         "chapter": "high-country",
         "title": "Breckenridge",
         "place": "Summit County, Colorado",
@@ -367,7 +370,7 @@ CURATED = {
     },
     # VII · Front Range & Foothills (7 stops, culminating on Mount Morrison!)
     22: {
-        "order": 33,
+        "order": 43,
         "chapter": "front-range",
         "title": "Cripple Creek",
         "place": "Teller County, Colorado",
@@ -377,7 +380,7 @@ CURATED = {
         "bearing": 48,
     },
     10: {
-        "order": 34,
+        "order": 44,
         "chapter": "front-range",
         "title": "Half Turn Road",
         "place": "Colorado Springs, Colorado",
@@ -387,7 +390,7 @@ CURATED = {
         "bearing": -96,
     },
     32: {
-        "order": 35,
+        "order": 45,
         "chapter": "front-range",
         "title": "Colorado Springs",
         "place": "El Paso County, Colorado",
@@ -397,7 +400,7 @@ CURATED = {
         "bearing": -104,
     },
     8: {
-        "order": 36,
+        "order": 46,
         "chapter": "front-range",
         "title": "18245 Pine Vista Place",
         "place": "Monument, Colorado",
@@ -407,7 +410,7 @@ CURATED = {
         "bearing": -102,
     },
     28: {
-        "order": 37,
+        "order": 47,
         "chapter": "front-range",
         "title": "Pine Vista Place",
         "place": "Monument, Colorado",
@@ -417,7 +420,7 @@ CURATED = {
         "bearing": -88,
     },
     9: {
-        "order": 38,
+        "order": 48,
         "chapter": "front-range",
         "title": "Empower Field at Mile High",
         "place": "Denver, Colorado",
@@ -427,7 +430,7 @@ CURATED = {
         "bearing": -85,
     },
     3: {
-        "order": 39,
+        "order": 49,
         "chapter": "front-range",
         "title": "Mount Morrison",
         "place": "Morrison, Colorado",

@@ -100,7 +100,7 @@ function renderHero() {
   $('#memory-count').textContent = memories.length;
   $('#sheet-link').href = data.sheetUrl;
   $('#hero-summary').textContent =
-    `${memories.length} places and ${photoCount} photographs & videos across ${data.chapters.length} regions—circling the globe from Amarillo and the Caribbean to France, New Zealand, and home to the Colorado Rockies.`;
+    `${memories.length} places and ${photoCount} photographs & videos across ${data.chapters.length} regions—circling the globe from Amarillo and the Caribbean to France & Italy, New Zealand, and home to the Colorado Rockies.`;
 
   $('#hero-chapters').innerHTML = data.chapters
     .map(
@@ -357,7 +357,7 @@ function goToStop(idx, { auto = state.autoPlay, instant = false } = {}) {
   if (!state.memories.length) return;
   if (idx < 0) idx = state.memories.length - 1;
   if (idx >= state.memories.length) {
-    // Completed all 37 places -> pull back to the full sunlit Earth overview!
+    // Completed all places -> pull back to the full sunlit Earth overview!
     return returnToGlobe();
   }
 
@@ -466,7 +466,7 @@ function returnToGlobe() {
     if (state.mode === 'overview') $('#memory-card').hidden = true;
   }, 450);
   syncTransportUI();
-  state.globe.globeOverview({ center: [-98, 33], immediate: false });
+  state.globe.globeOverview({ center: [-101.83, 35.2], immediate: false });
 }
 
 function toggleCinema(force) {
@@ -622,6 +622,20 @@ function bindEvents() {
       $('#drawer').hidden ? openDrawer() : closeDrawer();
     }
   });
+  window.addEventListener('hashchange', () => {
+    const h = location.hash.replace(/^#/, '');
+    if (!h) return;
+    if (h === 'tour') {
+      if (state.mode === 'overview') beginTour(0);
+      return;
+    }
+    if (state.memories[state.index]?.id === h) return;
+    const idx = state.memories.findIndex((m) => m.id === h);
+    if (idx >= 0) {
+      const instant = new URLSearchParams(location.search).get('instant') === '1';
+      goToStop(idx, { auto: false, instant });
+    }
+  });
 }
 
 async function init() {
@@ -661,7 +675,7 @@ async function init() {
       return;
     }
   }
-  state.globe.globeOverview({ center: [-98, 33], immediate: true });
+  state.globe.globeOverview({ center: [-101.83, 35.2], immediate: true });
 }
 
 init().catch((err) => {

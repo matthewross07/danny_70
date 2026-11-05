@@ -1,7 +1,164 @@
 [
   {
-    "id": "extra_seanor",
+    "id": "extra_msm",
+    "order": 13,
+    "chapter": "france",
+    "title": "Mont-Saint-Michel",
+    "place": "Normandy, France",
+    "coords": [-1.5115, 48.6361],
+    "zoom": 15.1,
+    "pitch": 63,
+    "bearing": 165,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2014_msm.jpg"}
+    ]
+  },
+  {
+    "id": "extra_omaha",
+    "order": 14,
+    "chapter": "france",
+    "title": "Omaha Beach",
+    "place": "Colleville-sur-Mer · Normandy, France",
+    "coords": [-0.8678, 49.3694],
+    "zoom": 14.3,
+    "pitch": 63,
+    "bearing": -145,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2014_omaha.jpg"}
+    ]
+  },
+  {
+    "id": "extra_etretat",
+    "order": 15,
+    "chapter": "france",
+    "title": "Étretat",
+    "place": "Normandy, France",
+    "coords": [0.2058, 49.7073],
+    "zoom": 14.7,
+    "pitch": 63,
+    "bearing": -125,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2014_etretat.jpg"}
+    ]
+  },
+  {
+    "id": "extra_chalencon",
+    "order": 17,
+    "chapter": "france",
+    "title": "Chalencon",
+    "place": "Saint-André-de-Chalencon · Haute-Loire, France",
+    "coords": [3.9824, 45.2836],
+    "zoom": 15.2,
+    "pitch": 63,
+    "bearing": 32,
+    "text": "et au long de ses pérégrinations en France et en Italie avec \"your French family\"! ( pétanque/ soupe à l'oignon/ Chalencon...);",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2011_01.jpg"},
+      {"type": "image", "src": "media/extra_euro_2011_02.jpg"},
+      {"type": "image", "src": "media/extra_euro_2011_03.jpg"}
+    ]
+  },
+  {
+    "id": "extra_lecros",
+    "order": 18,
+    "chapter": "france",
+    "title": "Le Cros · Tiranges",
+    "place": "Haute-Loire, France",
+    "coords": [3.9858, 45.2970],
+    "zoom": 14.6,
+    "pitch": 63,
+    "bearing": -24,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2016_01.jpg"},
+      {"type": "image", "src": "media/extra_euro_2016_02.jpg"},
+      {"type": "image", "src": "media/extra_euro_2016_03.jpg"},
+      {"type": "image", "src": "media/extra_euro_2022_soupe.jpg"}
+    ]
+  },
+  {
+    "id": "extra_stcyr",
+    "order": 22,
+    "chapter": "france",
+    "title": "Saint-Cyr-sur-Mer",
+    "place": "Provence-Alpes-Côte d’Azur, France",
+    "coords": [5.7118, 43.1815],
+    "zoom": 14.2,
+    "pitch": 63,
+    "bearing": 148,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2025_01.jpg"},
+      {"type": "image", "src": "media/extra_euro_2025_02.jpg"}
+    ]
+  },
+  {
+    "id": "extra_chamonix",
     "order": 23,
+    "chapter": "france",
+    "title": "Aiguille du Midi · Chamonix",
+    "place": "Haute-Savoie, France",
+    "coords": [6.8879, 45.8793],
+    "zoom": 13.3,
+    "pitch": 62,
+    "bearing": 155,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2022_midi.jpg"},
+      {"type": "image", "src": "media/extra_euro_2022_annes.jpg"}
+    ]
+  },
+  {
+    "id": "extra_venice",
+    "order": 24,
+    "chapter": "france",
+    "title": "Grand Canal · Venice",
+    "place": "Veneto, Italy",
+    "coords": [12.3285, 45.4422],
+    "zoom": 15.4,
+    "pitch": 63,
+    "bearing": 128,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2018_venice.jpg"}
+    ]
+  },
+  {
+    "id": "extra_florence",
+    "order": 25,
+    "chapter": "france",
+    "title": "Palazzo Pitti · Florence",
+    "place": "Tuscany, Italy",
+    "coords": [11.2508, 43.7645],
+    "zoom": 15.4,
+    "pitch": 63,
+    "bearing": 142,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2018_florence.jpg"}
+    ]
+  },
+  {
+    "id": "extra_rome",
+    "order": 26,
+    "chapter": "france",
+    "title": "Colosseum · Rome",
+    "place": "Lazio, Italy",
+    "coords": [12.4922, 41.8902],
+    "zoom": 15.6,
+    "pitch": 63,
+    "bearing": -64,
+    "text": "",
+    "media": [
+      {"type": "image", "src": "media/extra_euro_2018_rome.jpg"}
+    ]
+  },
+  {
+    "id": "extra_seanor",
+    "order": 33,
     "chapter": "high-country",
     "title": "Alpine Ridge Outside Ouray",
     "place": "San Juan Mountains, Colorado",
@@ -21,7 +178,7 @@
   },
   {
     "id": "extra_ryan",
-    "order": 25,
+    "order": 35,
     "chapter": "high-country",
     "title": "Colorado Backcountry",
     "place": "San Juan Mountains, Colorado",

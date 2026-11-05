@@ -1,8 +1,7 @@
-// 3D Landscape, Footpath & Horizon Choreography Engine
+// 3D Landscape & Horizon Choreography Engine
 // MapLibre GL 5.24 on a 3D terrain globe with sunlit golden-hour relief,
 // real backcountry hiking trails & mountain peaks draped over 3D topography,
-// terracotta-and-parchment footpath arcs, tactile trailhead posts, and a
-// gentle ridge-walk horizon camera.
+// clean uncluttered pinpoint markers, and a smooth 3-act globe camera.
 
 const VERSION = '5.24.0';
 const CDN = `https://cdn.jsdelivr.net/npm/maplibre-gl@${VERSION}/dist`;
@@ -189,18 +188,6 @@ const shortestDelta = (from, to) => mod(to - from + 180, 360) - 180;
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const easeInOutSine = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
 
-function circlePolygon([lon, lat], meters, steps = 20) {
-  const ring = [];
-  const cosLat = Math.max(0.15, Math.cos(toRad(lat)));
-  for (let i = 0; i <= steps; i++) {
-    const a = (i / steps) * 2 * Math.PI;
-    const dx = (meters * Math.cos(a)) / (R * cosLat);
-    const dy = (meters * Math.sin(a)) / R;
-    ring.push([lon + toDeg(dx), lat + toDeg(dy)]);
-  }
-  return [ring];
-}
-
 export function distanceKm(a, b) {
   const dLat = toRad(b[1] - a[1]);
   const dLon = toRad(b[0] - a[0]);
@@ -208,39 +195,6 @@ export function distanceKm(a, b) {
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(a[1])) * Math.cos(toRad(b[1])) * Math.sin(dLon / 2) ** 2;
   return (2 * R * Math.asin(Math.sqrt(h))) / 1000;
-}
-
-// Great-circle slerp arc between two [lon, lat] points (handles antimeridian cleanly)
-function greatCircleArc(a, b, segments = 64) {
-  const [lon1, lat1] = [toRad(a[0]), toRad(a[1])];
-  const [lon2, lat2] = [toRad(b[0]), toRad(b[1])];
-  const v1 = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
-  const v2 = [Math.cos(lat2) * Math.cos(lon2), Math.cos(lat2) * Math.sin(lon2), Math.sin(lat2)];
-  const dot = Math.max(-1, Math.min(1, v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]));
-  const omega = Math.acos(dot);
-  if (omega < 1e-5) return [[a, b]];
-
-  const sinO = Math.sin(omega);
-  const pts = [];
-  for (let i = 0; i <= segments; i++) {
-    const t = i / segments;
-    const s1 = Math.sin((1 - t) * omega) / sinO;
-    const s2 = Math.sin(t * omega) / sinO;
-    const x = s1 * v1[0] + s2 * v2[0];
-    const y = s1 * v1[1] + s2 * v2[1];
-    const z = s1 * v1[2] + s2 * v2[2];
-    pts.push([toDeg(Math.atan2(y, x)), toDeg(Math.atan2(z, Math.hypot(x, y)))]);
-  }
-
-  // Split across antimeridian jumps so MapLibre never draws a horizontal world-wrap line
-  const lines = [[]];
-  for (let i = 0; i < pts.length; i++) {
-    if (i > 0 && Math.abs(pts[i][0] - pts[i - 1][0]) > 180) {
-      lines.push([]);
-    }
-    lines[lines.length - 1].push(pts[i]);
-  }
-  return lines.filter((l) => l.length > 1);
 }
 
 // ---------- Globe3D Controller ----------
@@ -270,7 +224,7 @@ export class Globe3D {
     this.map = new maplibregl.Map({
       container: this.container,
       style: STYLE,
-      center: [-98, 34],
+      center: [-101.83, 35.2],
       zoom: this.idealGlobeZoom(),
       pitch: 10,
       bearing: 0,
@@ -289,64 +243,9 @@ export class Globe3D {
     this.map.setTerrain({ source: 'dem', exaggeration: 1.48 });
 
     const empty = { type: 'FeatureCollection', features: [] };
-    this.map.addSource('journey', { type: 'geojson', data: empty });
-    this.map.addSource('active-hop', { type: 'geojson', data: empty });
     this.map.addSource('beacons', { type: 'geojson', data: empty });
-    this.map.addSource('beacon-pillars', { type: 'geojson', data: empty });
 
-    // Warm terracotta & sun-bleached parchment footpath arcs
-    this.map.addLayer({
-      id: 'journey-glow',
-      type: 'line',
-      source: 'journey',
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': '#c96a3b',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 1, 2.8, 10, 5.5],
-        'line-blur': 2.5,
-        'line-opacity': 0.34,
-      },
-    });
-    this.map.addLayer({
-      id: 'journey-line',
-      type: 'line',
-      source: 'journey',
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': '#fff7e8',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 1, 1.2, 12, 2.0],
-        'line-dasharray': [2, 2.4],
-        'line-opacity': 0.72,
-      },
-    });
-
-    // Active walk segment between stops
-    this.map.addLayer({
-      id: 'hop-glow',
-      type: 'line',
-      source: 'active-hop',
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': '#d97843',
-        'line-width': 6,
-        'line-blur': 3.5,
-        'line-opacity': 0.62,
-      },
-    });
-    this.map.addLayer({
-      id: 'hop-core',
-      type: 'line',
-      source: 'active-hop',
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': '#fffaf0',
-        'line-width': 2.1,
-        'line-dasharray': [2.2, 2.2],
-        'line-opacity': 0.95,
-      },
-    });
-
-    // Warm sunlit cairn markers when viewing the full Earth atlas
+    // Clean sunlit pinpoint markers when viewing the full Earth atlas (no connecting lines)
     this.map.addLayer({
       id: 'beacons-glow',
       type: 'circle',
@@ -356,8 +255,8 @@ export class Globe3D {
         'circle-color': ['get', 'color'],
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
-          1, ['case', ['get', 'active'], 13, 7.5],
-          7, ['case', ['get', 'active'], 26, 15],
+          1, ['case', ['get', 'active'], 13, 7],
+          7, ['case', ['get', 'active'], 24, 14],
         ],
         'circle-blur': 0.9,
         'circle-opacity': ['interpolate', ['linear'], ['zoom'], 6, 0.85, 8.5, 0],
@@ -376,18 +275,6 @@ export class Globe3D {
         'circle-stroke-color': 'rgba(28, 42, 34, 0.65)',
         'circle-opacity': ['interpolate', ['linear'], ['zoom'], 6.5, 0.96, 8.5, 0],
         'circle-pitch-alignment': 'map',
-      },
-    });
-    this.map.addLayer({
-      id: 'beacon-pillars',
-      type: 'fill-extrusion',
-      source: 'beacon-pillars',
-      maxzoom: 5.5,
-      paint: {
-        'fill-extrusion-color': ['get', 'color'],
-        'fill-extrusion-height': ['get', 'height'],
-        'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 3.0, 0.72, 5.3, 0],
-        'fill-extrusion-vertical-gradient': true,
       },
     });
 
@@ -431,7 +318,7 @@ export class Globe3D {
       offset: 14,
     });
 
-    for (const layerId of ['beacons-glow', 'beacon-pillars', 'beacons-core', 'local-dot']) {
+    for (const layerId of ['beacons-glow', 'beacons-core', 'local-dot']) {
       this.map.on('click', layerId, (e) => {
         const f = e.features?.[0];
         if (f) {
@@ -553,16 +440,14 @@ export class Globe3D {
     }
   }
 
-  refreshSources(visitedIndex = -1) {
+  refreshSources() {
     if (!this.map?.getSource('beacons')) return;
     const pts = [];
-    const globePillars = [];
 
     for (let i = 0; i < this.memories.length; i++) {
       const m = this.memories[i];
       const active = m.id === this.activeId;
       const color = active ? '#e07a45' : this.chapterColors.get(m.chapter) || '#c96a3b';
-      const mediaBoost = Math.min(4, m.media?.length || 0);
 
       pts.push({
         type: 'Feature',
@@ -576,56 +461,9 @@ export class Globe3D {
         },
         geometry: { type: 'Point', coordinates: m.coords },
       });
-
-      globePillars.push({
-        type: 'Feature',
-        properties: {
-          id: m.id,
-          title: m.title,
-          place: m.place,
-          coords: JSON.stringify(m.coords),
-          color,
-          height: active ? 360000 : 120000 + mediaBoost * 45000,
-        },
-        geometry: { type: 'Polygon', coordinates: circlePolygon(m.coords, 12500, 16) },
-      });
     }
 
     this.map.getSource('beacons').setData({ type: 'FeatureCollection', features: pts });
-    this.map.getSource('beacon-pillars').setData({ type: 'FeatureCollection', features: globePillars });
-
-    // Build geodesic journey footpath arcs up to visitedIndex
-    const arcLines = [];
-    for (let i = 1; i <= visitedIndex && i < this.memories.length; i++) {
-      const a = this.memories[i - 1].coords;
-      const b = this.memories[i].coords;
-      if (distanceKm(a, b) > 5) {
-        for (const seg of greatCircleArc(a, b, 48)) arcLines.push(seg);
-      }
-    }
-    this.map.getSource('journey').setData({
-      type: 'FeatureCollection',
-      features: arcLines.map((coordinates) => ({
-        type: 'Feature',
-        geometry: { type: 'LineString', coordinates },
-      })),
-    });
-  }
-
-  setActiveHop(fromCoords, toCoords) {
-    if (!this.map?.getSource('active-hop')) return;
-    if (!fromCoords || !toCoords || distanceKm(fromCoords, toCoords) < 6) {
-      this.map.getSource('active-hop').setData({ type: 'FeatureCollection', features: [] });
-      return;
-    }
-    const segs = greatCircleArc(fromCoords, toCoords, 64);
-    this.map.getSource('active-hop').setData({
-      type: 'FeatureCollection',
-      features: segs.map((coordinates) => ({
-        type: 'Feature',
-        geometry: { type: 'LineString', coordinates },
-      })),
-    });
   }
 
   // Execute a single MapLibre native camera stage and resolve cleanly when complete or superseded
@@ -656,12 +494,11 @@ export class Globe3D {
   }
 
   // Spin the whole Earth slowly in Field Atlas overview mode
-  async globeOverview({ center = [-98, 28], immediate = false } = {}) {
+  async globeOverview({ center = [-101.83, 35.2], immediate = false } = {}) {
     this.stopOrbit();
     const token = ++this.flightToken;
     this.activeId = null;
-    this.setActiveHop(null, null);
-    this.refreshSources(this.memories.length - 1);
+    this.refreshSources();
     this.syncPinVisibility();
 
     const mobile = window.matchMedia('(max-width: 900px)').matches;
@@ -731,11 +568,11 @@ export class Globe3D {
   // Act 1: Zoom smoothly straight out over the current place (lifting gaze to overhead).
   // Act 2: Rotate the globe / glide high above at constant altitude & pitch (zero tile-pyramid thrashing).
   // Act 3: Descend smoothly straight down onto the destination and gently lift gaze to the horizon.
-  async flyToMemory(mem, prevMem, { visitedIndex = 0, speedMult = 1, onArrive } = {}) {
+  async flyToMemory(mem, prevMem, { speedMult = 1, onArrive } = {}) {
     this.stopOrbit();
     const token = ++this.flightToken;
     this.activeId = mem.id;
-    this.refreshSources(visitedIndex);
+    this.refreshSources();
 
     const startCenter = [this.map.getCenter().lng, this.map.getCenter().lat];
     const z0 = this.map.getZoom();
@@ -744,7 +581,6 @@ export class Globe3D {
     const km = distanceKm(startCenter, mem.coords);
     // Unmount HTML flags cleanly before lifting into space on long hops so the globe stays uncluttered
     this.syncPinVisibility({ unmountAll: km >= 3.5 });
-    this.setActiveHop(prevMem ? prevMem.coords : km > 40 ? startCenter : null, mem.coords);
 
     const pad1 = this.cameraPadding(true);
     const z1 = mem.zoom ?? 14.0;
@@ -755,7 +591,6 @@ export class Globe3D {
     const revealArrival = () => {
       if (revealed || this.flightToken !== token || this.activeId !== mem.id) return;
       revealed = true;
-      this.setActiveHop(null, null);
       this.syncPinVisibility();
       this.triggerArrivalBloom(mem.coords, this.chapterColors.get(mem.chapter) || '#c96a3b');
       onArrive?.();

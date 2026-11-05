@@ -2,7 +2,7 @@
   "person": "Danny Ross",
   "occasion": "70th Birthday",
   "sheetUrl": "https://docs.google.com/spreadsheets/d/12sDwVj_WVe_L3MBfgASWkneV4Kh1bYLxa-G3KWS6L9M/edit",
-  "updatedAt": "2026-11-05T21:48:48Z",
+  "updatedAt": "2026-11-05T22:23:43Z",
   "chapters": [
     {
       "id": "texas-plains",
@@ -25,7 +25,7 @@
     {
       "id": "france",
       "roman": "IV",
-      "name": "France & Europe",
+      "name": "France & Italy",
       "color": "#b88238"
     },
     {
@@ -375,12 +375,93 @@
       "elevFt": 1020
     },
     {
+      "id": "extra_msm",
+      "row": 1001,
+      "submittedAt": "",
+      "order": 13,
+      "chapter": "france",
+      "title": "Mont-Saint-Michel",
+      "place": "Normandy, France",
+      "coords": [
+        -1.5115,
+        48.6361
+      ],
+      "zoom": 15.1,
+      "pitch": 63,
+      "bearing": 165,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2014_msm.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 31,
+      "elevFt": 102
+    },
+    {
+      "id": "extra_omaha",
+      "row": 1002,
+      "submittedAt": "",
+      "order": 14,
+      "chapter": "france",
+      "title": "Omaha Beach",
+      "place": "Colleville-sur-Mer · Normandy, France",
+      "coords": [
+        -0.8678,
+        49.3694
+      ],
+      "zoom": 14.3,
+      "pitch": 63,
+      "bearing": -145,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2014_omaha.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 0,
+      "elevFt": 0
+    },
+    {
+      "id": "extra_etretat",
+      "row": 1003,
+      "submittedAt": "",
+      "order": 15,
+      "chapter": "france",
+      "title": "Étretat",
+      "place": "Normandy, France",
+      "coords": [
+        0.2058,
+        49.7073
+      ],
+      "zoom": 14.7,
+      "pitch": 63,
+      "bearing": -125,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2014_etretat.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 9,
+      "elevFt": 30
+    },
+    {
       "id": "m14",
       "row": 14,
       "submittedAt": "11/3/2026 19:37:43",
       "text": "Our first trip to France, we joined Matt and Colin to tour Notre-Dame de Paris. 2011",
       "rawLocation": "https://maps.app.goo.gl/xZjJjVm6YEFR9nra6",
-      "order": 13,
+      "order": 16,
       "chapter": "france",
       "title": "Notre-Dame de Paris",
       "place": "Paris, France",
@@ -415,12 +496,96 @@
       "elevFt": 125
     },
     {
+      "id": "extra_chalencon",
+      "row": 1004,
+      "submittedAt": "",
+      "order": 17,
+      "chapter": "france",
+      "title": "Chalencon",
+      "place": "Saint-André-de-Chalencon · Haute-Loire, France",
+      "coords": [
+        3.9824,
+        45.2836
+      ],
+      "zoom": 15.2,
+      "pitch": 63,
+      "bearing": 32,
+      "text": "et au long de ses pérégrinations en France et en Italie avec \"your French family\"! ( pétanque/ soupe à l'oignon/ Chalencon...);",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2011_01.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2011_02.jpg",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2011_03.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 644,
+      "elevFt": 2113
+    },
+    {
+      "id": "extra_lecros",
+      "row": 1005,
+      "submittedAt": "",
+      "order": 18,
+      "chapter": "france",
+      "title": "Le Cros · Tiranges",
+      "place": "Haute-Loire, France",
+      "coords": [
+        3.9858,
+        45.297
+      ],
+      "zoom": 14.6,
+      "pitch": 63,
+      "bearing": -24,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2016_01.jpg",
+          "width": 1600,
+          "height": 1067
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2016_02.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2016_03.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2022_soupe.jpg",
+          "width": 1200,
+          "height": 1600
+        }
+      ],
+      "elevM": 843,
+      "elevFt": 2766
+    },
+    {
       "id": "m15",
       "row": 15,
       "submittedAt": "11/3/2026 19:45:46",
       "text": "Danny is ready to eat his first big meal at chez de Provost ;)",
       "rawLocation": "https://maps.app.goo.gl/MPPnr1sse8uvABB67",
-      "order": 14,
+      "order": 19,
       "chapter": "france",
       "title": "Chez Provost · Crespinhac",
       "place": "Solignac-sous-Roche, France",
@@ -454,7 +619,7 @@
       "submittedAt": "11/3/2026 13:09:23",
       "text": "1st time in Crespinhac for a traditional french meal, Danny's face when he realized he had eaten a ton of \"entrée\" and there were going to be 3 or 4 other courses after that.",
       "rawLocation": "https://maps.app.goo.gl/mx2bArDBLfpEWbSB6",
-      "order": 15,
+      "order": 20,
       "chapter": "france",
       "title": "Crespinhac",
       "place": "Haute-Loire, France",
@@ -475,7 +640,7 @@
       "submittedAt": "11/3/2026 19:56:29",
       "text": "French grapes, French wine, & French Cherries too!",
       "rawLocation": "https://maps.app.goo.gl/jGQHG1KMHTjTVWpQ7",
-      "order": 16,
+      "order": 21,
       "chapter": "france",
       "title": "Domaine Guion",
       "place": "Provence, France",
@@ -510,12 +675,159 @@
       "elevFt": 850
     },
     {
+      "id": "extra_stcyr",
+      "row": 1006,
+      "submittedAt": "",
+      "order": 22,
+      "chapter": "france",
+      "title": "Saint-Cyr-sur-Mer",
+      "place": "Provence-Alpes-Côte d’Azur, France",
+      "coords": [
+        5.7118,
+        43.1815
+      ],
+      "zoom": 14.2,
+      "pitch": 63,
+      "bearing": 148,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2025_01.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2025_02.jpg",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
+      "elevM": 24,
+      "elevFt": 79
+    },
+    {
+      "id": "extra_chamonix",
+      "row": 1007,
+      "submittedAt": "",
+      "order": 23,
+      "chapter": "france",
+      "title": "Aiguille du Midi · Chamonix",
+      "place": "Haute-Savoie, France",
+      "coords": [
+        6.8879,
+        45.8793
+      ],
+      "zoom": 13.3,
+      "pitch": 62,
+      "bearing": 155,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2022_midi.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "type": "image",
+          "src": "media/extra_euro_2022_annes.jpg",
+          "width": 1200,
+          "height": 1600
+        }
+      ],
+      "elevM": 3651,
+      "elevFt": 11978
+    },
+    {
+      "id": "extra_venice",
+      "row": 1008,
+      "submittedAt": "",
+      "order": 24,
+      "chapter": "france",
+      "title": "Grand Canal · Venice",
+      "place": "Veneto, Italy",
+      "coords": [
+        12.3285,
+        45.4422
+      ],
+      "zoom": 15.4,
+      "pitch": 63,
+      "bearing": 128,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2018_venice.jpg",
+          "width": 1440,
+          "height": 1080
+        }
+      ],
+      "elevM": 6,
+      "elevFt": 20
+    },
+    {
+      "id": "extra_florence",
+      "row": 1009,
+      "submittedAt": "",
+      "order": 25,
+      "chapter": "france",
+      "title": "Palazzo Pitti · Florence",
+      "place": "Tuscany, Italy",
+      "coords": [
+        11.2508,
+        43.7645
+      ],
+      "zoom": 15.4,
+      "pitch": 63,
+      "bearing": 142,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2018_florence.jpg",
+          "width": 1440,
+          "height": 1080
+        }
+      ],
+      "elevM": 79,
+      "elevFt": 259
+    },
+    {
+      "id": "extra_rome",
+      "row": 1010,
+      "submittedAt": "",
+      "order": 26,
+      "chapter": "france",
+      "title": "Colosseum · Rome",
+      "place": "Lazio, Italy",
+      "coords": [
+        12.4922,
+        41.8902
+      ],
+      "zoom": 15.6,
+      "pitch": 63,
+      "bearing": -64,
+      "text": "",
+      "media": [
+        {
+          "type": "image",
+          "src": "media/extra_euro_2018_rome.jpg",
+          "width": 1067,
+          "height": 1600
+        }
+      ],
+      "elevM": 23,
+      "elevFt": 75
+    },
+    {
       "id": "m12",
       "row": 12,
       "submittedAt": "11/3/2026 19:20:08",
       "text": "Matt, Danny and I met Taylor in New Zealand when he did his study abroad in Australia.",
       "rawLocation": "https://maps.app.goo.gl/5Eiov1brrmeXFX1h6",
-      "order": 17,
+      "order": 27,
       "chapter": "pacific",
       "title": "Ross",
       "place": "West Coast, New Zealand",
@@ -555,7 +867,7 @@
       "submittedAt": "11/4/2026 18:37:20",
       "text": "Geo and Danny liked to have fun and make us laugh.",
       "rawLocation": "https://maps.app.goo.gl/viGmCZXF6KitFigMA",
-      "order": 18,
+      "order": 28,
       "chapter": "pacific",
       "title": "Pono Kai · Kapaʻa",
       "place": "Kauaʻi, Hawaiʻi",
@@ -583,7 +895,7 @@
       "submittedAt": "11/3/2026 19:27:26",
       "text": "A visit to Moab when Matt was studying soils at CU.",
       "rawLocation": "https://maps.app.goo.gl/FxyN3qD5gwA7joj38",
-      "order": 19,
+      "order": 29,
       "chapter": "high-country",
       "title": "Mesa Arch",
       "place": "Canyonlands · Moab, Utah",
@@ -611,7 +923,7 @@
       "submittedAt": "11/4/2026 19:03:23",
       "text": "Planning an elk hunt.",
       "rawLocation": "https://www.google.com/maps/place/Secluded+Cabin+on+11+Acres+w+%2FMountain+Views!+25+Min+to+Telluride!/@38.0454863,-108.6870786,8.88z/data=!4m15!1m2!2m1!1srustic+cabin+on+the+shortcut+to+teluride+co!3m11!1s0x873f2a9d3c1b1f3d:0x1e9b1718d98bcbd4!5m3!1s2026-11-19!4m1!1i2!8m2!3d37.9181709!4d-108.0136108!15sCixydXN0aWMgY2FiaW4gb24gdGhlIHNob3J0Y3V0IHRvIHRlbGx1cmlkZSBjb5IBD3ZhY2F0aW9uX3JlbnRhbOABAA!16s%2Fg%2F11mdsp78lv!17BQ0FF?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
-      "order": 20,
+      "order": 30,
       "chapter": "high-country",
       "title": "Mountain Cabin",
       "place": "Near Telluride, Colorado",
@@ -651,7 +963,7 @@
       "submittedAt": "11/3/2026 12:52:10",
       "text": "Riding horse in Telluride",
       "rawLocation": "https://maps.app.goo.gl/iwq9meyCv9EC6LMR9?g_st=ac",
-      "order": 21,
+      "order": 31,
       "chapter": "high-country",
       "title": "Telluride Valley",
       "place": "Telluride, Colorado",
@@ -679,7 +991,7 @@
       "submittedAt": "11/3/2026 13:28:27",
       "text": "That time when we were back packing and he had his binoculars out and saw a woman flipping him off from down the valley.",
       "rawLocation": "Outside of Ouray I think https://maps.apple/p/Wi4DEuMy.agFQw",
-      "order": 22,
+      "order": 32,
       "chapter": "high-country",
       "title": "Outside Ouray",
       "place": "San Juan Mountains, Colorado",
@@ -709,9 +1021,9 @@
     },
     {
       "id": "extra_seanor",
-      "row": 1001,
+      "row": 1011,
       "submittedAt": "",
-      "order": 23,
+      "order": 33,
       "chapter": "high-country",
       "title": "Alpine Ridge Outside Ouray",
       "place": "San Juan Mountains, Colorado",
@@ -740,7 +1052,7 @@
       "submittedAt": "11/4/2026 8:55:01",
       "text": "Honeymoon at cabins at Vallecito Lake.",
       "rawLocation": "https://maps.app.goo.gl/ZeSpKRTmHviNaXGN9?g_st=i",
-      "order": 24,
+      "order": 34,
       "chapter": "high-country",
       "title": "Vallecito Lake",
       "place": "Bayfield, Colorado",
@@ -776,9 +1088,9 @@
     },
     {
       "id": "extra_ryan",
-      "row": 1002,
+      "row": 1012,
       "submittedAt": "",
-      "order": 25,
+      "order": 35,
       "chapter": "high-country",
       "title": "Colorado Backcountry",
       "place": "San Juan Mountains, Colorado",
@@ -897,7 +1209,7 @@
       "submittedAt": "11/4/2026 19:36:55",
       "text": "Elk Hunt with Matt, Dad and Jim in 2015",
       "rawLocation": "https://maps.app.goo.gl/SP1PYc6vPoEn9e5x6?g_st=ic",
-      "order": 26,
+      "order": 36,
       "chapter": "high-country",
       "title": "San Juan Wilderness",
       "place": "Conejos County, Colorado",
@@ -937,7 +1249,7 @@
       "submittedAt": "11/4/2026 19:13:03",
       "text": "I asked Danny to spread ashes so Jim had one last hunt.",
       "rawLocation": "https://www.google.com/maps/place/Mix+Lake+Campground/@37.3596728,-106.552562,14.94z/data=!4m15!1m8!3m7!1s0x871602804ef89b23:0x36cec5323ff7e8e5!2sPlatoro,+CO+81132!3b1!8m2!3d37.3519502!4d-106.5328145!16s%2Fm%2F048q22y!3m5!1s0x873df8817e8e50d7:0xaf6bfebe034ce8b!8m2!3d37.35784!4d-106.54266!16s%2Fg%2F1tcvzx45?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
-      "order": 27,
+      "order": 37,
       "chapter": "high-country",
       "title": "Mix Lake Campground",
       "place": "Platoro, Colorado",
@@ -965,7 +1277,7 @@
       "submittedAt": "11/3/2026 14:10:32",
       "text": "From Trey - ‘1. ding ding ding’ and 2. ‘ummm…. you are a little close for that’.",
       "rawLocation": "Platoro, Colorado for both.",
-      "order": 28,
+      "order": 38,
       "chapter": "high-country",
       "title": "Platoro",
       "place": "Conejos River Valley, Colorado",
@@ -986,7 +1298,7 @@
       "submittedAt": "11/4/2026 18:55:46",
       "text": "Camping trip to Trujillo meadows so Danny and Jim could scout the area for their next hunting trip. Jim loved the hunting trips. The preparations the hunt and all the memories.",
       "rawLocation": "https://maps.app.goo.gl/eLye2oZtq8S7bdWw9",
-      "order": 29,
+      "order": 39,
       "chapter": "high-country",
       "title": "Trujillo Meadows",
       "place": "Cumbres Pass, Colorado",
@@ -1038,7 +1350,7 @@
       "submittedAt": "11/4/2026 14:49:35",
       "text": "Dan and his nephew, Seanor were sking together!",
       "rawLocation": "Somewhere near Breckenridge, CO",
-      "order": 30,
+      "order": 40,
       "chapter": "high-country",
       "title": "Tenmile Range",
       "place": "Near Breckenridge, Colorado",
@@ -1066,7 +1378,7 @@
       "submittedAt": "11/4/2026 20:06:21",
       "text": "Officiating our wedding!",
       "rawLocation": "https://maps.app.goo.gl/9zPNYPoifB33mUpT6?g_st=ic",
-      "order": 31,
+      "order": 41,
       "chapter": "high-country",
       "title": "BlueSky Breckenridge",
       "place": "Breckenridge, Colorado",
@@ -1087,7 +1399,7 @@
       "submittedAt": "11/3/2026 21:36:43",
       "text": "Grooving to party tunes on the dance floor at Taylor’s wedding.",
       "rawLocation": "Breckenridge CO",
-      "order": 32,
+      "order": 42,
       "chapter": "high-country",
       "title": "Breckenridge",
       "place": "Summit County, Colorado",
@@ -1108,7 +1420,7 @@
       "submittedAt": "11/4/2026 14:47:24",
       "text": "He and his boys when the colors were changing.  \nWe came up and took a little trip to Cripple Creek to see the aspens.  Beautiful",
       "rawLocation": "Cripple Creek, CO",
-      "order": 33,
+      "order": 43,
       "chapter": "front-range",
       "title": "Cripple Creek",
       "place": "Teller County, Colorado",
@@ -1136,7 +1448,7 @@
       "submittedAt": "11/3/2026 18:54:17",
       "text": "Moved to Colorado Springs. First time to live outside of Amarillo, TX!",
       "rawLocation": "https://maps.app.goo.gl/wgAiiXtnwHkUBqmEA",
-      "order": 34,
+      "order": 44,
       "chapter": "front-range",
       "title": "Half Turn Road",
       "place": "Colorado Springs, Colorado",
@@ -1157,7 +1469,7 @@
       "submittedAt": "11/4/2026 18:49:31",
       "text": "My Birthday wish for Danny is gratitude. Thank you for being in our lives from the beginning. You give us laughter and meaning. Blessings and Love. Our Wedding Jim and Rhonda",
       "rawLocation": "https://maps.app.goo.gl/dXwczUMeJP1jmgDj8",
-      "order": 35,
+      "order": 45,
       "chapter": "front-range",
       "title": "Colorado Springs",
       "place": "El Paso County, Colorado",
@@ -1185,7 +1497,7 @@
       "submittedAt": "11/3/2026 14:20:49",
       "text": "Our Russell family of 5 has memories of sleeping over with Danny and Debbie in their home in Colorado Springs. Danny and Debbie were always super hospitable to us. I remember big meals, walks around their backyard garden, walks around the neighborhood and the boys’ old toys they would put out for my kids to use. Danny would talk about how the buffs were playing, old hunting buddies, his boys and splash in a bit of some controversial politics.These are really good memories!! Thank you, Danny, for being such a great uncle!",
       "rawLocation": "House in monument",
-      "order": 36,
+      "order": 46,
       "chapter": "front-range",
       "title": "18245 Pine Vista Place",
       "place": "Monument, Colorado",
@@ -1206,7 +1518,7 @@
       "submittedAt": "11/4/2026 15:12:27",
       "text": "This was crazy Dan during the Covid shut down.  He made a recording of himself as Donald Trump talking about the shortage of toilet paper!\nHILARIOUS!!!! March 2020",
       "rawLocation": "Dan’s home in Colorado Springs",
-      "order": 37,
+      "order": 47,
       "chapter": "front-range",
       "title": "Pine Vista Place",
       "place": "Monument, Colorado",
@@ -1236,7 +1548,7 @@
       "submittedAt": "11/3/2026 17:27:15",
       "text": "When we went to the Aggies vs Buffs football game at Mile High Stadium with Taylor and Matt. Then went back to Taylor’s house and spent the night.",
       "rawLocation": "https://maps.app.goo.gl/NF2ZrG1YkVmjXXdA8?g_st=ic",
-      "order": 38,
+      "order": 48,
       "chapter": "front-range",
       "title": "Empower Field at Mile High",
       "place": "Denver, Colorado",
@@ -1270,7 +1582,7 @@
       "submittedAt": "11/3/2026 12:38:18",
       "text": "Hiking mt Morrison on his 70th. Only Slightly hung over",
       "rawLocation": "https://maps.app.goo.gl/r4WU7NXZsSPU7PYPA?g_st=ic",
-      "order": 39,
+      "order": 49,
       "chapter": "front-range",
       "title": "Mount Morrison",
       "place": "Morrison, Colorado",
