@@ -14,8 +14,8 @@ const fold = (s) =>
 
 const PACES = [
   { key: 'normal', label: 'Pace: Stroll', dwell: 1.0, flight: 1.0 },
-  { key: 'fast', label: 'Pace: Brisk', dwell: 0.68, flight: 0.72 },
-  { key: 'slow', label: 'Pace: Unhurried', dwell: 1.45, flight: 1.25 },
+  { key: 'slow', label: 'Pace: Unhurried', dwell: 1.45, flight: 1.35 },
+  { key: 'fast', label: 'Pace: Brisk', dwell: 0.68, flight: 0.68 },
 ];
 
 const state = {
@@ -81,13 +81,13 @@ function preloadMemoryMedia(mem) {
 
 function computeDwellMs(mem) {
   const words = (mem.text || '').trim().split(/\s+/).filter(Boolean).length;
-  const readingMs = Math.max(5200, Math.min(10800, 3400 + words * 85));
+  const readingMs = Math.max(7200, Math.min(13800, 4600 + words * 105));
   const media = mem.media || [];
   const video = media.find((m) => m.type === 'video');
   if (video && video.duration) {
-    return Math.round((video.duration * 1000 + 1100) * currentPace().dwell);
+    return Math.round((video.duration * 1000 + 1400) * currentPace().dwell);
   }
-  const galleryMs = media.length > 1 ? media.length * 3200 : 0;
+  const galleryMs = media.length > 1 ? media.length * 4200 : 0;
   return Math.round(Math.max(readingMs, galleryMs) * currentPace().dwell);
 }
 

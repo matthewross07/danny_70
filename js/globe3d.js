@@ -61,7 +61,7 @@ const STYLE = {
     },
   },
   layers: [
-    { id: 'bg', type: 'background', paint: { 'background-color': '#121f2e' } },
+    { id: 'bg', type: 'background', paint: { 'background-color': '#2b382f' } },
     {
       id: 'sat',
       type: 'raster',
@@ -183,6 +183,42 @@ const STYLE = {
 const R = 6371008.8;
 const toRad = (d) => (d * Math.PI) / 180;
 const toDeg = (r) => (r * 180) / Math.PI;
+const clamp01 = (x) => Math.max(0, Math.min(1, x));
+const smootherstep = (x) => {
+  const c = clamp01(x);
+  return c * c * c * (c * (c * 6 - 15) + 10);
+};
+const shortestBearingDelta = (from, to) => ((to - from + 540) % 360) - 180;
+
+// Exact spherical linear interpolation point at fraction t in [0, 1] (antimeridian-safe)
+function greatCirclePoint(a, b, t) {
+  const f = clamp01(t);
+  const [lon1, lat1] = [toRad(a[0]), toRad(a[1])];
+  const [lon2, lat2] = [toRad(b[0]), toRad(b[1])];
+  const v1 = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
+  const v2 = [Math.cos(lat2) * Math.cos(lon2), Math.cos(lat2) * Math.sin(lon2), Math.sin(lat2)];
+  const dot = Math.max(-1, Math.min(1, v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]));
+  const omega = Math.acos(dot);
+  if (omega < 1e-6) {
+    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+  }
+  const sinO = Math.sin(omega);
+  const s1 = Math.sin((1 - f) * omega) / sinO;
+  const s2 = Math.sin(f * omega) / sinO;
+  const x = s1 * v1[0] + s2 * v2[0];
+  const y = s1 * v1[1] + s2 * v2[1];
+  const z = s1 * v1[2] + s2 * v2[2];
+  return [toDeg(Math.atan2(y, x)), toDeg(Math.atan2(z, Math.hypot(x, y)))];
+}
+
+function lerpPadding(p0, p1, t) {
+  return {
+    top: (p0.top || 0) + ((p1.top || 0) - (p0.top || 0)) * t,
+    right: (p0.right || 0) + ((p1.right || 0) - (p0.right || 0)) * t,
+    bottom: (p0.bottom || 0) + ((p1.bottom || 0) - (p0.bottom || 0)) * t,
+    left: (p0.left || 0) + ((p1.left || 0) - (p0.left || 0)) * t,
+  };
+}
 
 function circlePolygon([lon, lat], meters, steps = 20) {
   const ring = [];
@@ -251,6 +287,7 @@ export class Globe3D {
     this.chapterColors = new Map();
     this.markers = new Map();
     this.activeId = null;
+    this.flightRaf = 0;
     this.orbitRaf = 0;
     this.fxRaf = 0;
     this.blooms = [];
@@ -266,9 +303,9 @@ export class Globe3D {
       style: STYLE,
       center: [-98, 34],
       zoom: this.idealGlobeZoom(),
-      pitch: 24,
+      pitch: 14,
       bearing: 0,
-      maxPitch: 82,
+      maxPitch: 76,
       attributionControl: { compact: true },
       pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
       fadeDuration: 0,
@@ -281,6 +318,45 @@ export class Globe3D {
 
     await new Promise((r) => (this.map.isStyleLoaded() ? r() : this.map.once('style.load', r)));
     this.map.setTerrain({ source: 'dem', exaggeration: 1.55 });
+
+    // Hard real-time 3D terrain & ridge-sightline clearance guard:
+    // Guarantees the camera eye AND foreground line-of-sight NEVER dip into or clip through terrain.
+    this.map.transformCameraUpdate = (tr) => {
+      if (!this.map?.terrain || tr.zoom < 6.2) return {};
+      const terrain = this.map.terrain;
+      const camLL = tr.getCameraLngLat();
+      const camAlt = tr.getCameraAltitude();
+      const centerLL = tr.center;
+      const targetAlt = tr.elevation || 0;
+
+      // Minimum vertical safety clearance above ground right under the camera lens (meters)
+      const minEyeClearance = Math.max(135, 135 * Math.pow(2, Math.max(0, 14.3 - tr.zoom) * 0.44));
+      let reqCamAlt = (terrain.getElevationForLngLatZoom(camLL, tr.zoom) || 0) + minEyeClearance;
+
+      // Also sample 3 points along the foreground sightline so intervening ridges never slice the view
+      for (const f of [0.22, 0.45, 0.68]) {
+        const sampleLL = new maplibregl.LngLat(
+          camLL.lng + (centerLL.lng - camLL.lng) * f,
+          camLL.lat + (centerLL.lat - camLL.lat) * f
+        );
+        const groundAtSample = terrain.getElevationForLngLatZoom(sampleLL, tr.zoom) || 0;
+        const margin = minEyeClearance * (1 - f * 0.68);
+        const aimAlt = targetAlt + 24;
+        const neededEyeAlt = (groundAtSample + margin - aimAlt * f) / (1 - f);
+        if (neededEyeAlt > reqCamAlt) reqCamAlt = neededEyeAlt;
+      }
+
+      if (camAlt < reqCamAlt && Number.isFinite(reqCamAlt)) {
+        const safe = this.map.calculateCameraOptionsFromTo(camLL, reqCamAlt, centerLL, targetAlt);
+        if (safe && Number.isFinite(safe.pitch) && Number.isFinite(safe.zoom)) {
+          return {
+            pitch: Math.min(tr.pitch, Math.max(0, safe.pitch)),
+            zoom: Math.min(tr.zoom, safe.zoom),
+          };
+        }
+      }
+      return {};
+    };
 
     const empty = { type: 'FeatureCollection', features: [] };
     this.map.addSource('journey', { type: 'geojson', data: empty });
@@ -663,69 +739,90 @@ export class Globe3D {
       return;
     }
 
-    this.programmatic = true;
-    this.map.flyTo({
-      center,
-      zoom: this.idealGlobeZoom(),
-      pitch: 12,
-      bearing: 0,
-      padding: overviewPad,
-      duration: 2400,
-      essential: true,
-    });
-    this.map.once('moveend', () => {
+    const startPos = [this.map.getCenter().lng, this.map.getCenter().lat];
+    const z0 = this.map.getZoom();
+    const p0 = this.map.getPitch();
+    const b0 = this.map.getBearing();
+    const bDelta = shortestBearingDelta(b0, 0);
+    const pad0 = this.map.getPadding();
+    const z1 = this.idealGlobeZoom();
+    const pullDuration = 5600;
+    const t0 = performance.now();
+
+    const stepOut = (now) => {
+      const rawT = clamp01((now - t0) / pullDuration);
+      const u = smootherstep(rawT);
+      const pos = greatCirclePoint(startPos, center, smootherstep(clamp01((rawT - 0.15) / 0.85)));
+      const pitch = p0 + (12 - p0) * smootherstep(clamp01(rawT / 0.55));
+      const zoom = z0 + (z1 - z0) * u;
+      this.programmatic = true;
+      this.map.jumpTo({
+        center: pos,
+        zoom,
+        pitch,
+        bearing: b0 + bDelta * u,
+        padding: lerpPadding(pad0, overviewPad, u),
+      });
       this.programmatic = false;
-      if (!this.activeId) startSpin();
-    });
+      if (rawT < 1) {
+        this.flightRaf = requestAnimationFrame(stepOut);
+      } else {
+        this.flightRaf = 0;
+        this.syncPinVisibility();
+        if (!this.activeId) startSpin();
+      }
+    };
+    this.flightRaf = requestAnimationFrame(stepOut);
   }
 
-  // Walk or fly to a specific memory and gently take in its 3D horizon
+  // High-Clearance 3-Phase Sky-Arc Choreographer:
+  // Lifts cleanly up into the open sky with an overhead gaze, traverses high above all mountain
+  // ranges along the geodesic path, descends vertically over the destination, and gently raises
+  // its gaze to the horizon at the end—never freezing target elevation underground or clipping ridges.
   flyToMemory(mem, prevMem, { visitedIndex = 0, speedMult = 1, onArrive } = {}) {
     this.stopOrbit();
     this.activeId = mem.id;
     this.refreshSources(visitedIndex);
     this.syncPinVisibility({ flyingToCoords: mem.coords });
 
-    const from = prevMem?.coords || [this.map.getCenter().lng, this.map.getCenter().lat];
-    const km = prevMem ? distanceKm(from, mem.coords) : 2500;
-    this.setActiveHop(prevMem ? from : null, mem.coords);
+    const startCenter = [this.map.getCenter().lng, this.map.getCenter().lat];
+    const z0 = this.map.getZoom();
+    const p0 = this.map.getPitch();
+    const b0 = this.map.getBearing();
+    const pad0 = this.map.getPadding();
 
-    const padding = this.cameraPadding(true);
-    const targetCam = {
-      center: mem.coords,
-      zoom: mem.zoom ?? 14.3,
-      pitch: mem.pitch ?? 74,
-      bearing: mem.bearing ?? 0,
-      padding,
-      essential: true,
-    };
+    const km = distanceKm(startCenter, mem.coords);
+    this.setActiveHop(prevMem ? prevMem.coords : km > 40 ? startCenter : null, mem.coords);
 
+    const pad1 = this.cameraPadding(true);
+    const z1 = mem.zoom ?? 14.1;
+    const p1 = mem.pitch ?? 67;
+    const b1 = mem.bearing ?? 0;
+    const bDelta = shortestBearingDelta(b0, b1);
+
+    const fromGlobe = !prevMem && z0 < 4.5;
+
+    // Meditative, unhurried durations scaled smoothly across local, regional, continental, and global hops
     let duration;
-    let useEase = false;
-    if (!prevMem && this.map.getZoom() < 4) {
+    if (fromGlobe) {
+      duration = 8800;
+    } else if (km < 3) {
       duration = 5200;
-    } else if (km < 16) {
-      // Nearby ridge / neighborhood walk: low-altitude glide
-      duration = 2000;
-      useEase = true;
+    } else if (km < 18) {
+      duration = 6600;
     } else if (km < 250) {
-      // Regional hop (e.g. Cripple Creek -> Denver, Ouray -> Moab)
-      duration = 3600 + (km / 250) * 1800;
+      duration = 8800 + (km / 250) * 3600;
     } else if (km < 1500) {
-      // Multi-state / country hop (e.g. Tucumcari -> Vallecito, Breckenridge -> Austin)
-      duration = 5400 + ((km - 250) / 1250) * 4400;
+      duration = 12600 + ((km - 250) / 1250) * 4600;
     } else if (km < 4500) {
-      // Continental arc (e.g. PA -> Amarillo, Moab -> Cancún -> Sint Maarten): ~10.6s–14s
-      duration = 9800 + ((km - 1500) / 3000) * 4200;
+      duration = 17500 + ((km - 1500) / 3000) * 5000;
     } else {
-      // Transoceanic / antipodal globe journey (e.g. Kauaʻi -> Paris, Provence -> NZ -> Colorado): ~16s–19.2s (~5x slower)
-      duration = 14000 + Math.min(1, (km - 4500) / 14500) * 5200;
+      duration = 23500 + Math.min(1, (km - 4500) / 14500) * 6500;
     }
     duration = Math.round(duration * speedMult);
 
     const myId = mem.id;
     let revealed = false;
-    let settled = false;
 
     const revealArrival = () => {
       if (revealed || this.activeId !== myId) return;
@@ -735,46 +832,93 @@ export class Globe3D {
       onArrive?.();
     };
 
-    const finishMove = () => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(this.earlyTimer);
+    if (speedMult === 0 || duration <= 0) {
+      this.programmatic = true;
+      this.map.jumpTo({ center: mem.coords, zoom: z1, pitch: p1, bearing: b1, padding: pad1 });
       this.programmatic = false;
-      if (this.activeId !== myId) return;
       revealArrival();
       this.syncPinVisibility();
       this.startLocalOrbit(mem);
-    };
-
-    if (speedMult === 0) {
-      this.programmatic = true;
-      this.map.jumpTo(targetCam);
-      finishMove();
       return;
     }
 
-    this.programmatic = true;
-    if (useEase) {
-      this.map.easeTo({ ...targetCam, duration });
-    } else {
-      const flyOpts = {
-        ...targetCam,
-        duration,
-        curve: km > 4500 ? 1.62 : km > 1500 ? 1.48 : 1.32,
-      };
-      if (km >= 500) {
-        // Symmetric sinusoidal ease-in-out so long globe flights lift off, cruise, and land unhurriedly
-        flyOpts.easing = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
+    // Continuous logarithmic sky-clearance ceiling zoom (guarantees climbing well above every peak)
+    const minGlobeZ = Math.max(1.45, this.idealGlobeZoom() + 0.08);
+    const rawApex = Math.max(minGlobeZ, Math.min(12.6, 13.35 - Math.log2(1 + km / 1.8) * 0.9));
+    const safeApex = Math.min(rawApex, z0 - 0.35, z1 - 0.8);
+    const pCruise = Math.max(10, Math.min(36, 40 - Math.log2(1 + km) * 2.8));
+
+    const t0 = performance.now();
+    const stepFlight = (now) => {
+      if (this.activeId !== myId) return;
+      const rawT = clamp01((now - t0) / duration);
+      const u = smootherstep(rawT);
+
+      let pos;
+      let zoom;
+      let pitch;
+      let bearing;
+
+      if (fromGlobe) {
+        // Rotate globe overhead first while still in space, then descend cleanly from above
+        const sPos = smootherstep(clamp01(rawT / 0.62));
+        pos = greatCirclePoint(startCenter, mem.coords, sPos);
+        zoom = z0 + (z1 - z0) * Math.pow(u, 1.42);
+        if (rawT < 0.64) {
+          pitch = p0 + (26 - p0) * smootherstep(rawT / 0.64);
+        } else {
+          pitch = 26 + (p1 - 26) * smootherstep((rawT - 0.64) / 0.36);
+        }
+        bearing = b0 + bDelta * smootherstep(clamp01((rawT - 0.22) / 0.78));
+      } else {
+        // Unified parabolic sky-arc: climb straight out of Valley A, traverse high above all peaks,
+        // center 100% over Valley B before final descent, then gently tilt gaze up to the horizon
+        const arch = Math.pow(Math.sin(Math.PI * u), 0.72);
+        const zBase = z0 + (z1 - z0) * u;
+        zoom = zBase * (1 - arch) + safeApex * arch;
+
+        const sPos = smootherstep(clamp01((rawT - 0.08) / 0.76));
+        pos = greatCirclePoint(startCenter, mem.coords, sPos);
+
+        if (rawT < 0.26) {
+          pitch = p0 + (pCruise - p0) * smootherstep(rawT / 0.26);
+        } else if (rawT < 0.72) {
+          pitch = pCruise;
+        } else {
+          pitch = pCruise + (p1 - pCruise) * smootherstep((rawT - 0.72) / 0.28);
+        }
+
+        bearing = b0 + bDelta * smootherstep(clamp01((rawT - 0.12) / 0.78));
       }
-      this.map.flyTo(flyOpts);
-    }
-    // Reveal the Field Journal card smoothly as we crest the ridge (~0.5s before final stop)
-    clearTimeout(this.earlyTimer);
-    this.earlyTimer = setTimeout(revealArrival, Math.max(0, duration - 500));
-    this.map.once('moveend', finishMove);
+
+      this.programmatic = true;
+      this.map.jumpTo({
+        center: pos,
+        zoom,
+        pitch,
+        bearing,
+        padding: lerpPadding(pad0, pad1, u),
+      });
+      this.programmatic = false;
+
+      if (!revealed && duration - (now - t0) <= 650) {
+        revealArrival();
+      }
+
+      if (rawT < 1) {
+        this.flightRaf = requestAnimationFrame(stepFlight);
+      } else {
+        this.flightRaf = 0;
+        revealArrival();
+        this.syncPinVisibility();
+        this.startLocalOrbit(mem);
+      }
+    };
+
+    this.flightRaf = requestAnimationFrame(stepFlight);
   }
 
-  // Gentle ridge-walk horizon gaze: bearing-only sway avoids terrain tile-LOD churn
+  // Gentle ridge-walk horizon gaze: slow, unhurried bearing sway
   startLocalOrbit(mem) {
     cancelAnimationFrame(this.orbitRaf);
     const baseBearing = typeof mem?.bearing === 'number' ? mem.bearing : this.map.getBearing();
@@ -782,7 +926,7 @@ export class Globe3D {
 
     const walkGaze = (now) => {
       const sec = (now - t0) / 1000;
-      const sway = Math.sin(sec * 0.24) * 6.5;
+      const sway = Math.sin(sec * 0.16) * 5.5;
       this.programmatic = true;
       this.map.setBearing(baseBearing + sway);
       this.programmatic = false;
@@ -793,7 +937,9 @@ export class Globe3D {
 
   stopOrbit() {
     clearTimeout(this.earlyTimer);
+    cancelAnimationFrame(this.flightRaf);
     cancelAnimationFrame(this.orbitRaf);
+    this.flightRaf = 0;
     this.orbitRaf = 0;
     this.map?.stop();
   }
