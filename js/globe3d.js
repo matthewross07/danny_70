@@ -526,18 +526,18 @@ export class Globe3D {
     this.syncPinVisibility();
   }
 
-  syncPinVisibility({ flyingToCoords = null } = {}) {
+  syncPinVisibility({ unmountAll = false } = {}) {
     if (!this.map) return;
-    const z = flyingToCoords ? 14 : this.map.getZoom();
-    const ref = flyingToCoords || [this.map.getCenter().lng, this.map.getCenter().lat];
+    const z = this.map.getZoom();
+    const ref = [this.map.getCenter().lng, this.map.getCenter().lat];
 
     for (const [id, entry] of this.markers) {
       const isActive = id === this.activeId;
       const km = distanceKm(ref, entry.coords);
-      const shouldMount = flyingToCoords
-        ? isActive
+      const shouldMount = unmountAll
+        ? false
         : isActive
-          ? z >= 7.0 && km < 120
+          ? z >= 8.0 && km < 90
           : z >= 12.2 && km < 12;
 
       const el = entry.marker.getElement();
@@ -736,13 +736,14 @@ export class Globe3D {
     const token = ++this.flightToken;
     this.activeId = mem.id;
     this.refreshSources(visitedIndex);
-    this.syncPinVisibility({ flyingToCoords: mem.coords });
 
     const startCenter = [this.map.getCenter().lng, this.map.getCenter().lat];
     const z0 = this.map.getZoom();
     const b0 = this.map.getBearing();
 
     const km = distanceKm(startCenter, mem.coords);
+    // Unmount HTML flags cleanly before lifting into space on long hops so the globe stays uncluttered
+    this.syncPinVisibility({ unmountAll: km >= 3.5 });
     this.setActiveHop(prevMem ? prevMem.coords : km > 40 ? startCenter : null, mem.coords);
 
     const pad1 = this.cameraPadding(true);
@@ -755,6 +756,7 @@ export class Globe3D {
       if (revealed || this.flightToken !== token || this.activeId !== mem.id) return;
       revealed = true;
       this.setActiveHop(null, null);
+      this.syncPinVisibility();
       this.triggerArrivalBloom(mem.coords, this.chapterColors.get(mem.chapter) || '#c96a3b');
       onArrive?.();
     };
