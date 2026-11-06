@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Danny Ross · A Walk Through Memory Lane (sonic_ray Prototype)</title>
+  <meta name="description" content="An alternative linear walk through seventy years of morphing landscapes rendered with sonic_ray on Apple Metal.">
+  <meta name="theme-color" content="#07122e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='17' fill='%2307122e' stroke='%232b63eb' stroke-width='1.8'/%3E%3Ccircle cx='18' cy='19' r='6.5' fill='%23002fa7' fill-opacity='.65'/%3E%3Ccircle cx='18' cy='19' r='2.8' fill='%23fffaf0'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/walk.css">
+  <script type="module" src="js/walk.js"></script>
+</head>
+<body>
+  <div class="walk-stage" id="walk-stage">
+    <!-- Full-bleed sonic_ray Metal path-traced morphing landscape film -->
+    <video
+      class="walk-video"
+      id="walk-video"
+      src="media/sonicray_walk_draft_v2.mp4"
+      playsinline
+      preload="auto"
+      muted
+    ></video>
+
+    <!-- Atmospheric vignette + hairline tether SVG layer -->
+    <div class="walk-haze" aria-hidden="true"></div>
+    <svg class="tether-svg" id="tether-svg" aria-hidden="true"></svg>
+
+    <!-- Floating Clustered Memory Vignettes Layer -->
+    <div class="cluster-layer" id="cluster-layer" aria-live="off"></div>
+
+    <!-- Top Masthead -->
+    <header class="walk-topbar">
+      <div class="walk-brand">
+        <span class="walker-gem" aria-hidden="true"></span>
+        <div>
+          <div class="walk-kicker">Seventy Years · <code>sonic_ray</code> Prototype</div>
+          <div class="walk-title">Danny Ross</div>
+        </div>
+      </div>
+
+      <!-- Current Canto / Era Whisper -->
+      <div class="canto-pill" id="canto-pill">
+        <span class="canto-roman" id="canto-roman">I</span>
+        <span class="canto-sep">·</span>
+        <span class="canto-name" id="canto-name">Amarillo, Tascosa &amp; Cousin Farms</span>
+        <span class="canto-era" id="canto-era">1956 – 1975</span>
+      </div>
+
+      <div class="walk-actions">
+        <button class="mode-pill" id="density-btn" type="button" title="Cycle memory display mode">
+          One by One
+        </button>
+        <a class="mode-pill ghost" href="media/sonicray_walk_hq_min1.mp4" target="_blank" rel="noopener" title="Watch the 1080p High-Quality First-Minute Review MP4">
+          HQ Min 1 ↗
+        </a>
+        <a class="mode-pill ghost" href="media/sonicray_walk_with_memories.mp4" target="_blank" rel="noopener" title="Open or download the full 5-minute standalone MP4 film">
+          Full MP4 ↗
+        </a>
+        <a class="mode-pill ghost" href="index.html" title="Switch to the interactive 3D Globe Atlas">
+          Globe Atlas →
+        </a>
+      </div>
+    </header>
+
+    <!-- Opening Title Veil (dismissed on Begin Walk) -->
+    <section class="intro-veil" id="intro-veil">
+      <div class="intro-card">
+        <p class="intro-eyebrow">1956 — 2026 · Linear Landscape Study</p>
+        <h1>A Hazy Walk Through Memory Lane</h1>
+        <p class="intro-copy">
+          Rendered coarsely in <code>sonic_ray</code> from real elevation terrain and 3D building footprints—walking from Amarillo’s flat plains and stadium lights through pine foothills, French gorges, and San Juan elk cirques to dawn on Mount Morrison.
+        </p>
+        <div class="intro-buttons">
+          <button class="begin-btn" id="begin-btn" type="button">
+            <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+            <span>Begin the Walk</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Canto Transition Watermark -->
+    <div class="canto-banner" id="canto-banner" hidden aria-hidden="true">
+      <div class="cb-roman" id="cb-roman">I</div>
+      <div class="cb-title" id="cb-title"></div>
+      <div class="cb-sub" id="cb-sub"></div>
+    </div>
+
+    <!-- Bottom Chronological Scrubber & Transport -->
+    <footer class="walk-dock">
+      <div class="transport-row">
+        <button class="play-btn" id="play-btn" type="button" aria-label="Play or pause walk">
+          <svg id="icon-play" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+          <svg id="icon-pause" viewBox="0 0 24 24" width="18" height="18" hidden><path fill="currentColor" d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+        </button>
+
+        <div class="timeline-wrap">
+          <div class="canto-ticks" id="canto-ticks"></div>
+          <input
+            type="range"
+            class="scrubber"
+            id="scrubber"
+            min="0"
+            max="300"
+            step="0.05"
+            value="0"
+            aria-label="Scrub through seventy years"
+          >
+        </div>
+
+        <div class="time-readout" id="time-readout">0:00 / 5:00</div>
+        <button class="speed-btn" id="speed-btn" type="button" title="Playback pace">1×</button>
+      </div>
+    </footer>
+
+    <!-- Full-Resolution Memory Lightbox when clicking any clustered vignette -->
+    <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-labelledby="lb-title">
+      <div class="lb-backdrop" id="lb-backdrop"></div>
+      <article class="lb-card">
+        <button class="lb-close" id="lb-close" type="button" aria-label="Close memory">✕</button>
+        <div class="lb-media" id="lb-media" hidden></div>
+        <div class="lb-body">
+          <div class="lb-meta">
+            <span class="lb-era" id="lb-era"></span>
+            <span class="lb-place" id="lb-place"></span>
+          </div>
+          <h2 class="lb-title" id="lb-title"></h2>
+          <blockquote class="lb-quote" id="lb-quote" hidden></blockquote>
+          <p class="lb-author" id="lb-author" hidden></p>
+        </div>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

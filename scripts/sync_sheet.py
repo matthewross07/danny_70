@@ -18,9 +18,12 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from PIL import Image, ImageOps
+
 ROOT = Path(__file__).resolve().parent.parent
 SHEET_ID = "12sDwVj_WVe_L3MBfgASWkneV4Kh1bYLxa-G3KWS6L9M"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
+GITHUB_PAGES_BASE = "https://matthewross07.github.io/danny_70/"
 LOCAL_UPLOADS = next(
     (Path.home() / "Library/CloudStorage").glob(
         "GoogleDrive-*/My Drive/Untitled form (File responses)/"
@@ -31,6 +34,8 @@ LOCAL_UPLOADS = next(
 MEDIA_DIR = ROOT / "media"
 DATA_OUT = ROOT / "data" / "memories.json"
 EXTRA_IN = ROOT / "data" / "extra_memories.json"
+SHEET_MIRROR_CSV = ROOT / "danny_70_sheet_mirror.csv"
+SHEET_SYNC_JSON = ROOT / "data" / "google_sheet_sync_payload.json"
 GEOCACHE_PATH = ROOT / "scripts" / ".geocache.json"
 
 # Purely Place-based geographic regions in a continuous West-to-East loop around the Earth,
@@ -453,35 +458,37 @@ def save_geocache(cache):
     GEOCACHE_PATH.write_text(json.dumps(cache, indent=2))
 
 
+def get_drive_file_id(p: Path):
+    """Return Google Drive item ID from macOS DriveFS extended attributes if synced."""
+    try:
+        fid = subprocess.check_output(
+            ["xattr", "-p", "com.google.drivefs.item-id#S", str(p)],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        return fid or None
+    except Exception:
+        return None
+
+
 def build_local_drive_index():
-    """Map Google Drive file IDs to local paths via macOS DriveFS xattr."""
+    """Map Google Drive file IDs to local paths across both Form Uploads and media/."""
     idx = {}
-    if not LOCAL_UPLOADS.exists():
-        return idx
-    for p in sorted(LOCAL_UPLOADS.iterdir()):
-        if p.name.startswith("."):
+    for folder in (LOCAL_UPLOADS, MEDIA_DIR):
+        if not folder.exists():
             continue
-        try:
-            fid = subprocess.check_output(
-                ["xattr", "-p", "com.google.drivefs.item-id#S", str(p)],
-                text=True,
-                stderr=subprocess.DEVNULL,
-            ).strip()
-            if fid:
+        for p in sorted(folder.rglob("*")):
+            if not p.is_file() or p.name.startswith("."):
+                continue
+            fid = get_drive_file_id(p)
+            if fid and fid not in idx:
                 idx[fid] = p
-        except Exception:
-            pass
     return idx
 
 
 def get_image_dims(path: Path):
-    out = subprocess.check_output(
-        ["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(path)],
-        text=True,
-    )
-    w = int([l.split(":")[-1].strip() for l in out.splitlines() if "pixelWidth" in l][0])
-    h = int([l.split(":")[-1].strip() for l in out.splitlines() if "pixelHeight" in l][0])
-    return w, h
+    with Image.open(path) as im:
+        return im.size
 
 
 def get_video_dims(path: Path):
@@ -593,6 +600,17 @@ def process_media_item(row_idx: int, item_num: int, fid: str, local_index: dict)
         "m24_01": "iw:ih*0.705:0:ih*0.200",
         "m27_01": "iw:ih*0.610:0:ih*0.194",
     }
+    # If `src` is already a curated web asset inside `media/` (e.g. synced back into the Google Sheet!),
+    # reference it directly without re-encoding or duplicating files!
+    if src.parent.resolve() == MEDIA_DIR.resolve() and src.suffix.lower() == ".jpg":
+        w, h = get_image_dims(src)
+        return {
+            "type": "image",
+            "src": f"media/{src.name}",
+            "width": w,
+            "height": h,
+        }
+
     dst = MEDIA_DIR / f"{stem}.jpg"
     if not dst.exists():
         if stem in SCREENSHOT_CROPS:
@@ -612,26 +630,22 @@ def process_media_item(row_idx: int, item_num: int, fid: str, local_index: dict)
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
-        else:
+        elif ext == ".heic":
+            tmp_png = Path(f"/tmp/danny_heic_{stem}.png")
             subprocess.run(
-                [
-                    "sips",
-                    "-s",
-                    "format",
-                    "jpeg",
-                    "-s",
-                    "formatOptions",
-                    "85",
-                    "-Z",
-                    "1600",
-                    str(src),
-                    "--out",
-                    str(dst),
-                ],
+                ["sips", "-s", "format", "png", "-Z", "1600", str(src), "--out", str(tmp_png)],
                 check=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
+            with Image.open(tmp_png) as im:
+                ImageOps.exif_transpose(im).convert("RGB").save(dst, format="JPEG", quality=86)
+            tmp_png.unlink(missing_ok=True)
+        else:
+            with Image.open(src) as im:
+                im_up = ImageOps.exif_transpose(im).convert("RGB")
+                im_up.thumbnail((1600, 1600), Image.Resampling.LANCZOS)
+                im_up.save(dst, format="JPEG", quality=86)
     w, h = get_image_dims(dst)
     return {
         "type": "image",
@@ -728,6 +742,15 @@ def main():
     print(f"Indexed {len(local_index)} local Drive media uploads.")
     geocache = load_geocache()
 
+    extras_list = json.loads(EXTRA_IN.read_text()) if EXTRA_IN.exists() else []
+    # Index extra_memories by first media src and by (round(lon,3), round(lat,3)) so that once
+    # they are pushed into the Google Sheet, Sheet rows inherit their curated settings without duplicating!
+    extra_by_media = {}
+    for ex in extras_list:
+        for em in ex.get("media", []):
+            extra_by_media[em["src"]] = ex
+
+    matched_extra_ids = set()
     memories = []
     for idx, r in enumerate(rows[1:], start=1):
         if not any(cell.strip() for cell in r):
@@ -737,11 +760,48 @@ def main():
         raw_loc = r[2].strip() if len(r) > 2 else ""
         raw_media = r[3].strip() if len(r) > 3 else ""
 
+        fids = re.findall(r"id=([A-Za-z0-9_-]+)", raw_media)
+        direct_rels = re.findall(r"(?:https?://[^\s,]+/)?(media/[A-Za-z0-9_.-]+\.(?:jpg|jpeg|png|mp4))", raw_media)
+        media_items = []
+        seen_srcs = set()
+
+        for m_i, fid in enumerate(fids, start=1):
+            item = process_media_item(idx, m_i, fid, local_index)
+            if item["src"] not in seen_srcs:
+                seen_srcs.add(item["src"])
+                media_items.append(item)
+
+        for rel in direct_rels:
+            p = ROOT / rel
+            if p.exists() and rel not in seen_srcs:
+                seen_srcs.add(rel)
+                if p.suffix.lower() == ".mp4":
+                    w, h, dur = get_video_dims(p)
+                    media_items.append({"type": "video", "src": rel, "width": w, "height": h, "duration": dur})
+                else:
+                    w, h = get_image_dims(p)
+                    media_items.append({"type": "image", "src": rel, "width": w, "height": h})
+
+        for sup_rel in SUPPLEMENTAL_ROW_MEDIA.get(idx, []):
+            sup_path = ROOT / sup_rel
+            if sup_path.exists() and sup_rel not in seen_srcs:
+                seen_srcs.add(sup_rel)
+                w, h = get_image_dims(sup_path)
+                media_items.append({"type": "image", "src": sup_rel, "width": w, "height": h})
+
+        # Check if this Sheet row corresponds to a pushed extra_memories entry
+        matched_ex = None
+        for it in media_items:
+            if it["src"] in extra_by_media:
+                matched_ex = extra_by_media[it["src"]]
+                break
+
         cur = CURATED.get(idx)
         if cur:
             text = raw_text
             if cur.get("clean_suffix") and text.endswith(cur["clean_suffix"]):
                 text = text[: -len(cur["clean_suffix"])].rstrip()
+            mem_id = f"m{idx:02d}"
             meta = {
                 "order": cur["order"],
                 "chapter": cur["chapter"],
@@ -752,8 +812,23 @@ def main():
                 "pitch": cur.get("pitch", 44),
                 "bearing": cur.get("bearing", 0),
             }
+        elif matched_ex:
+            matched_extra_ids.add(matched_ex["id"])
+            mem_id = matched_ex["id"]
+            text = raw_text
+            meta = {
+                "order": matched_ex["order"],
+                "chapter": matched_ex.get("chapter", classify_region(matched_ex["coords"])),
+                "title": matched_ex["title"],
+                "place": matched_ex["place"],
+                "coords": matched_ex["coords"],
+                "zoom": matched_ex.get("zoom", 13.5),
+                "pitch": matched_ex.get("pitch", 43),
+                "bearing": matched_ex.get("bearing", 0),
+            }
         else:
             geo = resolve_new_location(raw_loc, geocache)
+            mem_id = f"m{idx:02d}"
             text = raw_text
             meta = {
                 "order": 100 + idx,
@@ -766,20 +841,9 @@ def main():
                 "bearing": (idx * 37) % 360 - 180,
             }
 
-        fids = re.findall(r"id=([A-Za-z0-9_-]+)", raw_media)
-        media_items = []
-        for m_i, fid in enumerate(fids, start=1):
-            media_items.append(process_media_item(idx, m_i, fid, local_index))
-
-        for sup_rel in SUPPLEMENTAL_ROW_MEDIA.get(idx, []):
-            sup_path = ROOT / sup_rel
-            if sup_path.exists():
-                w, h = get_image_dims(sup_path)
-                media_items.append({"type": "image", "src": sup_rel, "width": w, "height": h})
-
         memories.append(
             {
-                "id": f"m{idx:02d}",
+                "id": mem_id,
                 "row": idx,
                 "submittedAt": ts,
                 "text": text,
@@ -789,28 +853,28 @@ def main():
             }
         )
 
-    # Merge any manual memories from texts/emails/folders in data/extra_memories.json
-    if EXTRA_IN.exists():
-        extras = json.loads(EXTRA_IN.read_text())
-        for ex_i, ex in enumerate(extras, start=1):
-            ex_media = [enrich_media_entry(m) for m in ex.get("media", [])]
-            memories.append(
-                {
-                    "id": ex.get("id", f"extra_{ex_i:02d}"),
-                    "row": 1000 + ex_i,
-                    "submittedAt": ex.get("submittedAt", ""),
-                    "order": ex.get("order", 900 + ex_i),
-                    "chapter": ex.get("chapter", classify_region(ex["coords"])),
-                    "title": ex["title"],
-                    "place": ex["place"],
-                    "coords": ex["coords"],
-                    "zoom": ex.get("zoom", 13.5),
-                    "pitch": ex.get("pitch", 43),
-                    "bearing": ex.get("bearing", 0),
-                    "text": ex.get("text", ""),
-                    "media": ex_media,
-                }
-            )
+    # Merge any manual memories from data/extra_memories.json not yet pushed to the Google Sheet
+    for ex_i, ex in enumerate(extras_list, start=1):
+        if ex.get("id") in matched_extra_ids:
+            continue
+        ex_media = [enrich_media_entry(m) for m in ex.get("media", [])]
+        memories.append(
+            {
+                "id": ex.get("id", f"extra_{ex_i:02d}"),
+                "row": 1000 + ex_i,
+                "submittedAt": ex.get("submittedAt", ""),
+                "order": ex.get("order", 900 + ex_i),
+                "chapter": ex.get("chapter", classify_region(ex["coords"])),
+                "title": ex["title"],
+                "place": ex["place"],
+                "coords": ex["coords"],
+                "zoom": ex.get("zoom", 13.5),
+                "pitch": ex.get("pitch", 43),
+                "bearing": ex.get("bearing", 0),
+                "text": ex.get("text", ""),
+                "media": ex_media,
+            }
+        )
 
     memories.sort(key=lambda m: (m["order"], m["row"]))
 
@@ -827,6 +891,82 @@ def main():
     except Exception as e:
         print("Elevation lookup skipped:", e)
 
+    # Also write a 100% Google-Sheet-compatible CSV mirror + JSON writeback payload
+    # resolving every improved local media asset to its real Google Drive link (via DriveFS xattr)
+    # and GitHub Pages fallback URL so the Google Sheet and web app stay permanently unified!
+    def media_to_drive_links(media_list):
+        links = []
+        for it in media_list:
+            p = ROOT / it["src"]
+            fid = get_drive_file_id(p) if p.exists() else None
+            if fid:
+                links.append(f"https://drive.google.com/open?id={fid}")
+            else:
+                links.append(GITHUB_PAGES_BASE + it["src"])
+        return ", ".join(links)
+
+    row_updates = []
+    for r_idx, sup_list in sorted(SUPPLEMENTAL_ROW_MEDIA.items()):
+        # Combine any existing row media links with supplemental Drive links
+        orig_cell = rows[r_idx][3].strip() if r_idx < len(rows) and len(rows[r_idx]) > 3 else ""
+        existing_parts = [x.strip() for x in orig_cell.split(",") if x.strip()]
+        for sup_rel in sup_list:
+            fid = get_drive_file_id(ROOT / sup_rel)
+            dlink = f"https://drive.google.com/open?id={fid}" if fid else (GITHUB_PAGES_BASE + sup_rel)
+            if dlink not in existing_parts:
+                existing_parts.append(dlink)
+        row_updates.append({"sheet_row": r_idx + 1, "form_row": r_idx, "media_col_d": ", ".join(existing_parts)})
+
+    append_rows = []
+    for ex in extras_list:
+        if ex.get("id") in matched_extra_ids:
+            continue
+        lon, lat = ex["coords"]
+        gmaps = f"https://www.google.com/maps?q={lat:.5f},{lon:.5f}"
+        append_rows.append({
+            "id": ex["id"],
+            "timestamp": "11/5/2026 16:00:00",
+            "description": ex.get("text", ""),
+            "location": f"{ex['title']} ({ex['place']}) {gmaps}",
+            "media": media_to_drive_links(ex.get("media", [])),
+        })
+
+    SHEET_SYNC_JSON.write_text(json.dumps({
+        "sheet_id": SHEET_ID,
+        "row_updates": row_updates,
+        "append_rows": append_rows,
+    }, indent=2, ensure_ascii=False))
+
+    with SHEET_MIRROR_CSV.open("w", newline="", encoding="utf-8") as cf:
+        w_csv = csv.writer(cf)
+        w_csv.writerow([
+            "Timestamp",
+            "Written description of a memory with Danny",
+            "Location where that memory occurred (ideally a Google Maps link)",
+            "Photos or videos associated with the memory (optional)",
+            "id",
+            "title",
+            "place",
+            "longitude",
+            "latitude",
+            "web_media_srcs",
+        ])
+        for m in sorted(memories, key=lambda x: x["row"]):
+            lon, lat = m["coords"]
+            loc_str = m.get("rawLocation") or f"{m['title']} ({m['place']}) https://www.google.com/maps?q={lat:.5f},{lon:.5f}"
+            w_csv.writerow([
+                m.get("submittedAt") or "11/5/2026 16:00:00",
+                m.get("text", ""),
+                loc_str,
+                media_to_drive_links(m.get("media", [])),
+                m["id"],
+                m["title"],
+                m["place"],
+                lon,
+                lat,
+                ", ".join(it["src"] for it in m.get("media", [])),
+            ])
+
     payload = {
         "person": "Danny Ross",
         "occasion": "70th Birthday",
@@ -839,6 +979,7 @@ def main():
     DATA_OUT.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
     total_media = sum(len(m["media"]) for m in memories)
     print(f"Wrote {DATA_OUT} ({len(memories)} memories, {total_media} media items).")
+    print(f"Wrote {SHEET_MIRROR_CSV} & {SHEET_SYNC_JSON} ({len(row_updates)} row updates, {len(append_rows)} new rows ready for Google Sheet).")
 
 
 if __name__ == "__main__":

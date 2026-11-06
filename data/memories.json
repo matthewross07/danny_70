@@ -2,7 +2,7 @@
   "person": "Danny Ross",
   "occasion": "70th Birthday",
   "sheetUrl": "https://docs.google.com/spreadsheets/d/12sDwVj_WVe_L3MBfgASWkneV4Kh1bYLxa-G3KWS6L9M/edit",
-  "updatedAt": "2026-11-05T23:51:22Z",
+  "updatedAt": "2026-11-06T00:48:09Z",
   "chapters": [
     {
       "id": "texas-plains",
@@ -339,8 +339,8 @@
         {
           "type": "image",
           "src": "media/m21_01.jpg",
-          "width": 1600,
-          "height": 1200
+          "width": 1200,
+          "height": 1600
         }
       ],
       "elevM": 649,
@@ -1365,8 +1365,8 @@
         {
           "type": "image",
           "src": "media/m23_01.jpg",
-          "width": 1600,
-          "height": 1200
+          "width": 1200,
+          "height": 1600
         }
       ],
       "elevM": 3034,
@@ -1435,8 +1435,8 @@
         {
           "type": "image",
           "src": "media/m22_01.jpg",
-          "width": 1600,
-          "height": 1200
+          "width": 1200,
+          "height": 1600
         }
       ],
       "elevM": 2889,
@@ -1597,8 +1597,8 @@
         {
           "type": "image",
           "src": "media/m03_01.jpg",
-          "width": 1200,
-          "height": 1600
+          "width": 1600,
+          "height": 1200
         }
       ],
       "elevM": 2390,
