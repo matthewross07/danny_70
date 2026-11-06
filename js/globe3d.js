@@ -43,7 +43,7 @@ const STYLE = {
       type: 'raster-dem',
       tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
       tileSize: 256,
-      maxzoom: 13,
+      maxzoom: 11,
       encoding: 'terrarium',
       attribution: 'Terrain: AWS · Map data © OpenStreetMap',
     },
@@ -78,10 +78,10 @@ const STYLE = {
       type: 'hillshade',
       source: 'hs',
       paint: {
-        'hillshade-exaggeration': 0.56,
-        'hillshade-shadow-color': '#142636',
-        'hillshade-highlight-color': 'rgba(255, 236, 198, 0.44)',
-        'hillshade-accent-color': '#233a30',
+        'hillshade-exaggeration': 0.42,
+        'hillshade-shadow-color': '#122236',
+        'hillshade-highlight-color': 'rgba(255, 244, 222, 0.36)',
+        'hillshade-accent-color': '#1d3242',
         'hillshade-illumination-direction': 292,
       },
     },
@@ -228,7 +228,7 @@ export class Globe3D {
       zoom: this.idealGlobeZoom(),
       pitch: 10,
       bearing: 0,
-      maxPitch: 72,
+      maxPitch: 52,
       attributionControl: { compact: true },
       pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       fadeDuration: 0,
@@ -240,7 +240,7 @@ export class Globe3D {
     );
 
     await new Promise((r) => (this.map.isStyleLoaded() ? r() : this.map.once('style.load', r)));
-    this.map.setTerrain({ source: 'dem', exaggeration: 1.48 });
+    this.map.setTerrain({ source: 'dem', exaggeration: 1.0 });
 
     const empty = { type: 'FeatureCollection', features: [] };
     this.map.addSource('beacons', { type: 'geojson', data: empty });
@@ -255,8 +255,8 @@ export class Globe3D {
         'circle-color': ['get', 'color'],
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
-          1, ['case', ['get', 'active'], 13, 7],
-          7, ['case', ['get', 'active'], 24, 14],
+          1, ['case', ['get', 'active'], 14, 7],
+          7, ['case', ['get', 'active'], 25, 14],
         ],
         'circle-blur': 0.9,
         'circle-opacity': ['interpolate', ['linear'], ['zoom'], 6, 0.85, 8.5, 0],
@@ -269,30 +269,30 @@ export class Globe3D {
       source: 'beacons',
       maxzoom: 8.5,
       paint: {
-        'circle-color': '#fff8ea',
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 2.5, 7, 4.4],
-        'circle-stroke-width': 1.2,
-        'circle-stroke-color': 'rgba(28, 42, 34, 0.65)',
+        'circle-color': ['case', ['get', 'active'], '#002fa7', '#fffaf2'],
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 2.6, 7, 4.5],
+        'circle-stroke-width': 1.3,
+        'circle-stroke-color': ['case', ['get', 'active'], '#fffaf2', 'rgba(0, 47, 167, 0.72)'],
         'circle-opacity': ['interpolate', ['linear'], ['zoom'], 6.5, 0.96, 8.5, 0],
         'circle-pitch-alignment': 'map',
       },
     });
 
-    // Ground survey ring + trailhead cairn dot on 3D hillsides up close
+    // Ground survey ring + Klein Blue trailhead dot on 3D hillsides up close
     this.map.addLayer({
       id: 'local-glow',
       type: 'circle',
       source: 'beacons',
       minzoom: 7.5,
       paint: {
-        'circle-color': ['case', ['get', 'active'], '#d97843', '#e8d7bd'],
+        'circle-color': ['case', ['get', 'active'], '#1b4fd8', '#dbe4f7'],
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
-          8, ['case', ['get', 'active'], 12, 6],
-          15, ['case', ['get', 'active'], 24, 11],
+          8, ['case', ['get', 'active'], 13, 6],
+          15, ['case', ['get', 'active'], 25, 11],
         ],
-        'circle-blur': 0.75,
-        'circle-opacity': ['case', ['get', 'active'], 0.72, 0.34],
+        'circle-blur': 0.78,
+        'circle-opacity': ['case', ['get', 'active'], 0.74, 0.32],
         'circle-pitch-alignment': 'map',
       },
     });
@@ -302,10 +302,10 @@ export class Globe3D {
       source: 'beacons',
       minzoom: 7.5,
       paint: {
-        'circle-color': ['case', ['get', 'active'], '#c96a3b', '#f7f1e5'],
-        'circle-radius': ['case', ['get', 'active'], 5.8, 3.8],
+        'circle-color': ['case', ['get', 'active'], '#002fa7', '#f7f4ec'],
+        'circle-radius': ['case', ['get', 'active'], 6.0, 3.8],
         'circle-stroke-width': ['case', ['get', 'active'], 2.4, 1.5],
-        'circle-stroke-color': '#fffaf0',
+        'circle-stroke-color': ['case', ['get', 'active'], '#fffdf9', 'rgba(0, 47, 167, 0.55)'],
         'circle-pitch-alignment': 'map',
       },
     });
@@ -425,7 +425,7 @@ export class Globe3D {
         ? false
         : isActive
           ? z >= 8.0 && km < 90
-          : z >= 12.2 && km < 12;
+          : z >= 11.8 && km < 14;
 
       const el = entry.marker.getElement();
       el.classList.toggle('active', isActive);
@@ -447,7 +447,7 @@ export class Globe3D {
     for (let i = 0; i < this.memories.length; i++) {
       const m = this.memories[i];
       const active = m.id === this.activeId;
-      const color = active ? '#e07a45' : this.chapterColors.get(m.chapter) || '#c96a3b';
+      const color = active ? '#1b4fd8' : this.chapterColors.get(m.chapter) || '#002fa7';
 
       pts.push({
         type: 'Feature',
@@ -467,7 +467,7 @@ export class Globe3D {
   }
 
   // Execute a single MapLibre native camera stage and resolve cleanly when complete or superseded
-  runCameraStage(token, options) {
+  runCameraStage(token, options, method = 'easeTo') {
     return new Promise((resolve) => {
       if (this.flightToken !== token || !this.map) {
         resolve(false);
@@ -485,10 +485,10 @@ export class Globe3D {
       };
       this.stageCleanup = finish;
       this.map.on('moveend', finish);
-      fallbackTimer = setTimeout(finish, (options.duration || 0) + 240);
+      fallbackTimer = setTimeout(finish, (options.duration || 0) + 320);
 
       this.programmatic = true;
-      this.map.easeTo({ ...options, essential: true });
+      this.map[method]({ ...options, essential: true });
       this.programmatic = false;
     });
   }
@@ -564,10 +564,10 @@ export class Globe3D {
     startSpin();
   }
 
-  // Uncoupled 3-Act Globe & Landscape Choreographer:
-  // Act 1: Zoom smoothly straight out over the current place (lifting gaze to overhead).
-  // Act 2: Rotate the globe / glide high above at constant altitude & pitch (zero tile-pyramid thrashing).
-  // Act 3: Descend smoothly straight down onto the destination and gently lift gaze to the horizon.
+  // Smooth Region-Aware & Surface-Safe Camera Choreographer:
+  // - Within a town/valley (<= 22 km): single continuous easeTo with zero zoom-out.
+  // - Within a region (22–900 km): single seamless flyTo arc high above all ridges (zero multi-stage pauses).
+  // - Across oceans (>= 900 km): 1) zoom straight out to globe, 2) rotate globe, 3) descend into new continent.
   async flyToMemory(mem, prevMem, { speedMult = 1, onArrive } = {}) {
     this.stopOrbit();
     const token = ++this.flightToken;
@@ -576,15 +576,15 @@ export class Globe3D {
 
     const startCenter = [this.map.getCenter().lng, this.map.getCenter().lat];
     const z0 = this.map.getZoom();
-    const b0 = this.map.getBearing();
 
     const km = distanceKm(startCenter, mem.coords);
-    // Unmount HTML flags cleanly before lifting into space on long hops so the globe stays uncluttered
-    this.syncPinVisibility({ unmountAll: km >= 3.5 });
+    // Only unmount pins when lifting all the way out to orbital globe view across oceans
+    this.syncPinVisibility({ unmountAll: km >= 900 });
 
     const pad1 = this.cameraPadding(true);
-    const z1 = mem.zoom ?? 14.0;
-    const p1 = mem.pitch ?? 64;
+    const zeroPad = { top: 0, right: 0, bottom: 0, left: 0 };
+    const z1 = mem.zoom ?? 13.5;
+    const p1 = Math.min(48, mem.pitch ?? 44);
     const b1 = mem.bearing ?? 0;
 
     let revealed = false;
@@ -592,7 +592,7 @@ export class Globe3D {
       if (revealed || this.flightToken !== token || this.activeId !== mem.id) return;
       revealed = true;
       this.syncPinVisibility();
-      this.triggerArrivalBloom(mem.coords, this.chapterColors.get(mem.chapter) || '#c96a3b');
+      this.triggerArrivalBloom(mem.coords, '#002fa7');
       onArrive?.();
     };
 
@@ -610,139 +610,90 @@ export class Globe3D {
     const minGlobeZ = this.idealGlobeZoom();
 
     if (fromGlobe) {
-      // Already zoomed out in space: rotate the globe first, then descend cleanly onto Stop 1
-      const okRotate = await this.runCameraStage(token, {
-        center: mem.coords,
-        zoom: z0,
-        pitch: 8,
-        bearing: 0,
-        padding: pad1,
-        duration: Math.round(4200 * speedMult),
-        easing: easeInOutSine,
-      });
-      if (!okRotate) return;
+      if (km >= 1200) {
+        const okRotate = await this.runCameraStage(token, {
+          center: mem.coords,
+          zoom: z0,
+          pitch: 8,
+          bearing: 0,
+          padding: zeroPad,
+          duration: Math.round(3600 * speedMult),
+          easing: easeInOutSine,
+        });
+        if (!okRotate) return;
+      }
 
-      const zoomInMs = Math.round(5800 * speedMult);
+      const zoomInMs = Math.round(5200 * speedMult);
       this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 550));
-      const okIn = await this.runCameraStage(token, {
+      const okIn = await this.runCameraStage(
+        token,
+        {
+          center: mem.coords,
+          zoom: z1,
+          pitch: p1,
+          bearing: b1,
+          padding: pad1,
+          curve: 1.2,
+          duration: zoomInMs,
+          easing: easeInOutSine,
+        },
+        'flyTo'
+      );
+      if (!okIn) return;
+    } else if (km <= 22) {
+      // Same town, neighborhood, or mountain valley: glide smoothly across without zooming out first!
+      const glideMs = Math.round((2400 + Math.min(1800, km * 95)) * speedMult);
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, glideMs - 450));
+      const okGlide = await this.runCameraStage(token, {
         center: mem.coords,
         zoom: z1,
         pitch: p1,
         bearing: b1,
-        padding: pad1,
-        duration: zoomInMs,
-        easing: easeInOutCubic,
-      });
-      if (!okIn) return;
-    } else if (km < 3.5) {
-      // Immediate walking-distance neighbor in the same town/meadow:
-      // Gently step up to a neighborhood overlook, glide across, and settle back down
-      const cruiseZoom = Math.min(z0, z1, 13.4) - (km < 0.5 ? 0.85 : 1.35);
-      const midBearing = b0 + shortestDelta(b0, b1) * 0.5;
-
-      const okOut = await this.runCameraStage(token, {
-        center: startCenter,
-        zoom: cruiseZoom,
-        pitch: 30,
-        bearing: midBearing,
-        padding: pad1,
-        duration: Math.round(1650 * speedMult),
-        easing: easeInOutCubic,
-      });
-      if (!okOut) return;
-
-      const okGlide = await this.runCameraStage(token, {
-        center: mem.coords,
-        zoom: cruiseZoom,
-        pitch: 30,
-        bearing: midBearing,
-        padding: pad1,
-        duration: Math.round(1850 * speedMult),
-        easing: easeInOutSine,
-      });
-      if (!okGlide) return;
-
-      const zoomInMs = Math.round(1850 * speedMult);
-      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 450));
-      const okIn = await this.runCameraStage(token, {
-        center: mem.coords,
-        zoom: z1,
-        pitch: p1,
-        bearing: b1,
-        padding: pad1,
-        duration: zoomInMs,
-        easing: easeInOutCubic,
-      });
-      if (!okIn) return;
-    } else if (km < 300) {
-      // Regional valley-to-valley walk:
-      // 1) Zoom straight out above the mountain range, 2) glide overhead at constant altitude, 3) zoom down in
-      const cruiseZoom = Math.max(5.3, Math.min(11.3, 12.65 - Math.log2(1 + km) * 0.92));
-      const cruisePitch = km > 60 ? 12 : 16;
-      const cruiseBearing = km > 45 ? 0 : b0 + shortestDelta(b0, b1) * 0.5;
-
-      const zoomOutMs = Math.round((2500 + Math.min(1400, Math.log2(1 + km) * 180)) * speedMult);
-      const glideMs = Math.round((2600 + Math.min(2200, (km / 300) * 2200)) * speedMult);
-      const zoomInMs = Math.round((2800 + Math.min(1500, Math.log2(1 + km) * 190)) * speedMult);
-
-      const okOut = await this.runCameraStage(token, {
-        center: startCenter,
-        zoom: cruiseZoom,
-        pitch: cruisePitch,
-        bearing: cruiseBearing,
-        padding: pad1,
-        duration: zoomOutMs,
-        easing: easeInOutCubic,
-      });
-      if (!okOut) return;
-
-      const okGlide = await this.runCameraStage(token, {
-        center: mem.coords,
-        zoom: cruiseZoom,
-        pitch: cruisePitch,
-        bearing: cruiseBearing,
         padding: pad1,
         duration: glideMs,
         easing: easeInOutSine,
       });
       if (!okGlide) return;
-
-      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 550));
-      const okIn = await this.runCameraStage(token, {
-        center: mem.coords,
-        zoom: z1,
-        pitch: p1,
-        bearing: b1,
-        padding: pad1,
-        duration: zoomInMs,
-        easing: easeInOutCubic,
-      });
-      if (!okIn) return;
+    } else if (km < 900) {
+      // Intra-regional overland glide: one unbroken smooth arc over ridges & valleys (no stop-and-go zoom out)
+      const curve = km < 100 ? 0.92 : km < 350 ? 1.04 : 1.14;
+      const flyMs = Math.round((3600 + Math.min(2800, Math.log2(1 + km) * 310)) * speedMult);
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, flyMs - 550));
+      const okFly = await this.runCameraStage(
+        token,
+        {
+          center: mem.coords,
+          zoom: z1,
+          pitch: p1,
+          bearing: b1,
+          padding: pad1,
+          curve,
+          duration: flyMs,
+          easing: easeInOutSine,
+        },
+        'flyTo'
+      );
+      if (!okFly) return;
     } else {
-      // Continental & Global transitions:
-      // Act 1: Pull straight out into space to reveal the sunlit 3D Earth (North-up).
-      // Act 2: Rotate the globe smoothly at constant orbital altitude & overhead gaze.
-      // Act 3: Descend straight down into the new landscape and lift gaze onto the horizon.
-      const globeCruiseZoom =
-        km >= 3500
-          ? minGlobeZ + 0.04
-          : km >= 1200
-            ? minGlobeZ + 0.52
-            : Math.max(minGlobeZ + 1.1, 3.25 - ((km - 300) / 900) * 0.6);
-      const cruisePitch = km >= 1200 ? 6 : 10;
+      // Ocean & Inter-Continental crossings (>= 900 km):
+      // Act 1: Zoom straight out to orbital globe view.
+      // Act 2: Rotate the sunlit globe smoothly across the ocean.
+      // Act 3: Descend cleanly into the new continent.
+      const globeCruiseZoom = km >= 3500 ? minGlobeZ + 0.05 : minGlobeZ + 0.55;
+      const cruisePitch = 6;
 
-      const zoomOutMs = Math.round((5000 + Math.min(1600, (km / 6000) * 1600)) * speedMult);
-      const rotateMs = Math.round((4600 + Math.min(6800, (km / 18800) * 6800)) * speedMult);
-      const zoomInMs = Math.round((5400 + Math.min(1400, (km / 6000) * 1400)) * speedMult);
+      const zoomOutMs = Math.round((4400 + Math.min(1200, (km / 6000) * 1200)) * speedMult);
+      const rotateMs = Math.round((4200 + Math.min(5800, (km / 18800) * 5800)) * speedMult);
+      const zoomInMs = Math.round((4800 + Math.min(1200, (km / 6000) * 1200)) * speedMult);
 
       const okOut = await this.runCameraStage(token, {
         center: startCenter,
         zoom: globeCruiseZoom,
         pitch: cruisePitch,
         bearing: 0,
-        padding: pad1,
+        padding: zeroPad,
         duration: zoomOutMs,
-        easing: easeInOutCubic,
+        easing: easeInOutSine,
       });
       if (!okOut) return;
 
@@ -752,22 +703,27 @@ export class Globe3D {
         zoom: globeCruiseZoom,
         pitch: cruisePitch,
         bearing: 0,
-        padding: pad1,
+        padding: zeroPad,
         duration: rotateMs,
         easing: easeInOutSine,
       });
       if (!okRotate) return;
 
-      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 600));
-      const okIn = await this.runCameraStage(token, {
-        center: mem.coords,
-        zoom: z1,
-        pitch: p1,
-        bearing: b1,
-        padding: pad1,
-        duration: zoomInMs,
-        easing: easeInOutCubic,
-      });
+      this.earlyTimer = setTimeout(revealArrival, Math.max(0, zoomInMs - 550));
+      const okIn = await this.runCameraStage(
+        token,
+        {
+          center: mem.coords,
+          zoom: z1,
+          pitch: p1,
+          bearing: b1,
+          padding: pad1,
+          curve: 1.18,
+          duration: zoomInMs,
+          easing: easeInOutSine,
+        },
+        'flyTo'
+      );
       if (!okIn) return;
     }
 
@@ -800,25 +756,25 @@ export class Globe3D {
     this.map?.stop();
   }
 
-  // Warm golden-hour ground ripple & drifting meadow pollen motes on arrival
-  triggerArrivalBloom(coords, accent = '#c96a3b') {
+  // Subtle Klein Blue & warm sunlit ground ripple on arrival
+  triggerArrivalBloom(coords, accent = '#002fa7') {
     const sparks = [];
-    const count = 22;
+    const count = 18;
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.35;
-      const speed = 16 + Math.random() * 42;
+      const speed = 14 + Math.random() * 36;
       sparks.push({
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed * 0.55 - (16 + Math.random() * 28),
-        size: 1.5 + Math.random() * 2.1,
-        life: 0.95 + Math.random() * 0.65,
+        vy: Math.sin(angle) * speed * 0.55 - (14 + Math.random() * 24),
+        size: 1.4 + Math.random() * 1.9,
+        life: 0.9 + Math.random() * 0.6,
       });
     }
     this.blooms.push({
       coords,
       accent,
       t0: performance.now(),
-      duration: 2100,
+      duration: 1950,
       sparks,
     });
     if (!this.fxRaf) this.loopFx();
@@ -864,7 +820,7 @@ export class Globe3D {
           const y = pt.y + s.vy * elapsed * 0.72;
           const alpha = Math.sin(sp * Math.PI);
           ctx.globalAlpha = alpha * 0.82;
-          ctx.fillStyle = sp < 0.5 ? '#fff8e6' : '#f0c987';
+          ctx.fillStyle = sp < 0.5 ? '#fffaf0' : '#3b6ff5';
           ctx.beginPath();
           ctx.arc(x, y, s.size * (1 - sp * 0.3), 0, Math.PI * 2);
           ctx.fill();

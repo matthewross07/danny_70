@@ -6,22 +6,22 @@
  */
 
 :root {
-  --sky-deep: #111d2b;
-  --paper: rgba(247, 242, 232, 0.97);
-  --paper-solid: #f7f2e8;
-  --paper-warm: #f1eadb;
-  --mat: #e8dfd0;
-  --ink: #1a261f;
-  --ink-soft: #2f3e35;
-  --sage: #59695e;
-  --faint: #7a877d;
-  --terra: #b85a32;
-  --terra-soft: rgba(184, 90, 50, 0.12);
-  --pine: #1f362b;
-  --pine-hover: #294739;
-  --ochre: #c98a35;
-  --rule: rgba(31, 54, 43, 0.12);
-  --rule-strong: rgba(31, 54, 43, 0.22);
+  --sky-deep: #0e1928;
+  --paper: rgba(248, 245, 238, 0.97);
+  --paper-solid: #f8f5ee;
+  --paper-warm: #f2ede2;
+  --mat: #eae3d5;
+  --ink: #141f2c;
+  --ink-soft: #2c3b4b;
+  --sage: #556575;
+  --faint: #758494;
+  --terra: #002fa7;
+  --terra-soft: rgba(0, 47, 167, 0.10);
+  --pine: #002fa7;
+  --pine-hover: #003cc7;
+  --ochre: #2b63eb;
+  --rule: rgba(20, 31, 44, 0.11);
+  --rule-strong: rgba(20, 31, 44, 0.20);
 
   --serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
   --sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -330,7 +330,7 @@ body.cinema-mode:hover .cinema-exit,
   background: var(--pine);
   color: #f8f4ec;
   font: 600 14px var(--sans);
-  box-shadow: 0 10px 24px rgba(24, 42, 33, 0.28);
+  box-shadow: 0 10px 24px rgba(0, 47, 167, 0.26);
   transition: transform 0.18s ease, background 0.18s ease;
 }
 .primary-btn:hover {
@@ -672,7 +672,7 @@ body.cinema-mode:hover .cinema-exit,
   content: '“';
   display: block;
   font: 500 52px/0.68 var(--serif);
-  color: rgba(184, 90, 50, 0.36);
+  color: rgba(0, 47, 167, 0.32);
   margin-bottom: 6px;
 }
 .memory-card.photo-only .mc-media {
@@ -742,9 +742,9 @@ body.cinema-mode:hover .cinema-exit,
   z-index: 6;
 }
 .pin-label.active .pin-flag {
-  background: #fbf8f1;
+  background: #fbf9f4;
   border-color: var(--terra);
-  box-shadow: 0 10px 28px rgba(14, 23, 19, 0.34), 0 0 0 3px rgba(184, 90, 50, 0.18);
+  box-shadow: 0 10px 28px rgba(14, 23, 34, 0.30), 0 0 0 3px rgba(0, 47, 167, 0.18);
 }
 .pin-label.active .pin-flag em {
   background: var(--terra);

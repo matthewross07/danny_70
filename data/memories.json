@@ -2,49 +2,49 @@
   "person": "Danny Ross",
   "occasion": "70th Birthday",
   "sheetUrl": "https://docs.google.com/spreadsheets/d/12sDwVj_WVe_L3MBfgASWkneV4Kh1bYLxa-G3KWS6L9M/edit",
-  "updatedAt": "2026-11-05T22:23:43Z",
+  "updatedAt": "2026-11-05T23:51:22Z",
   "chapters": [
     {
       "id": "texas-plains",
       "roman": "I",
       "name": "Texas & the High Plains",
-      "color": "#c96a3b"
+      "color": "#002fa7"
     },
     {
       "id": "caribbean",
       "roman": "II",
       "name": "Caribbean Coasts",
-      "color": "#3d8b8c"
+      "color": "#0e7490"
     },
     {
       "id": "pennsylvania",
       "roman": "III",
       "name": "Pennsylvania Hills",
-      "color": "#7a8446"
+      "color": "#3d6b52"
     },
     {
       "id": "france",
       "roman": "IV",
       "name": "France & Italy",
-      "color": "#b88238"
+      "color": "#1d4ed8"
     },
     {
       "id": "pacific",
       "roman": "V",
       "name": "Pacific Horizons",
-      "color": "#46799e"
+      "color": "#0369a1"
     },
     {
       "id": "high-country",
       "roman": "VI",
       "name": "Red Rock & High Country",
-      "color": "#3f7a5c"
+      "color": "#b4532a"
     },
     {
       "id": "front-range",
       "roman": "VII",
       "name": "Front Range & Foothills",
-      "color": "#c88a32"
+      "color": "#284594"
     }
   ],
   "memories": [
@@ -62,9 +62,9 @@
         -101.801,
         35.2032
       ],
-      "zoom": 15.5,
-      "pitch": 64,
-      "bearing": -26,
+      "zoom": 14.8,
+      "pitch": 45,
+      "bearing": -18,
       "media": [
         {
           "type": "image",
@@ -90,9 +90,9 @@
         -101.8792,
         35.1938
       ],
-      "zoom": 15.4,
-      "pitch": 64,
-      "bearing": 22,
+      "zoom": 14.8,
+      "pitch": 45,
+      "bearing": 10,
       "media": [
         {
           "type": "image",
@@ -118,9 +118,9 @@
         -101.8809,
         35.1946
       ],
-      "zoom": 15.3,
-      "pitch": 64,
-      "bearing": 74,
+      "zoom": 14.7,
+      "pitch": 45,
+      "bearing": 28,
       "media": [],
       "elevM": 1113,
       "elevFt": 3652
@@ -139,9 +139,9 @@
         -101.9044,
         35.166
       ],
-      "zoom": 14.6,
-      "pitch": 64,
-      "bearing": 28,
+      "zoom": 14.3,
+      "pitch": 45,
+      "bearing": 16,
       "media": [],
       "elevM": 1130,
       "elevFt": 3707
@@ -160,9 +160,9 @@
         -101.8784,
         35.1737
       ],
-      "zoom": 14.6,
-      "pitch": 64,
-      "bearing": -22,
+      "zoom": 14.3,
+      "pitch": 45,
+      "bearing": -10,
       "media": [],
       "elevM": 1115,
       "elevFt": 3658
@@ -181,9 +181,9 @@
         -101.8625,
         35.1845
       ],
-      "zoom": 14.7,
-      "pitch": 64,
-      "bearing": 35,
+      "zoom": 14.4,
+      "pitch": 45,
+      "bearing": 14,
       "media": [
         {
           "type": "image",
@@ -209,9 +209,9 @@
         -103.7231,
         35.1537
       ],
-      "zoom": 13.9,
-      "pitch": 64,
-      "bearing": 132,
+      "zoom": 13.5,
+      "pitch": 44,
+      "bearing": 42,
       "media": [
         {
           "type": "image",
@@ -237,9 +237,9 @@
         -97.7419,
         30.2616
       ],
-      "zoom": 15.3,
-      "pitch": 64,
-      "bearing": -58,
+      "zoom": 14.6,
+      "pitch": 45,
+      "bearing": -28,
       "media": [],
       "elevM": 145,
       "elevFt": 476
@@ -258,9 +258,9 @@
         -86.7527,
         21.2146
       ],
-      "zoom": 13.9,
-      "pitch": 64,
-      "bearing": -32,
+      "zoom": 13.5,
+      "pitch": 44,
+      "bearing": -24,
       "media": [
         {
           "type": "image",
@@ -286,9 +286,9 @@
         -63.0946,
         18.0302
       ],
-      "zoom": 14.1,
-      "pitch": 64,
-      "bearing": 48,
+      "zoom": 13.7,
+      "pitch": 44,
+      "bearing": 36,
       "media": [
         {
           "type": "image",
@@ -332,9 +332,9 @@
         -79.08,
         40.015
       ],
-      "zoom": 13.3,
-      "pitch": 64,
-      "bearing": -32,
+      "zoom": 12.9,
+      "pitch": 43,
+      "bearing": -24,
       "media": [
         {
           "type": "image",
@@ -360,9 +360,9 @@
         -79.384,
         40.3173
       ],
-      "zoom": 13.8,
-      "pitch": 64,
-      "bearing": 122,
+      "zoom": 13.4,
+      "pitch": 44,
+      "bearing": 20,
       "media": [
         {
           "type": "image",
@@ -386,9 +386,9 @@
         -1.5115,
         48.6361
       ],
-      "zoom": 15.1,
-      "pitch": 63,
-      "bearing": 165,
+      "zoom": 14.5,
+      "pitch": 45,
+      "bearing": 155,
       "text": "",
       "media": [
         {
@@ -413,8 +413,8 @@
         -0.8678,
         49.3694
       ],
-      "zoom": 14.3,
-      "pitch": 63,
+      "zoom": 13.9,
+      "pitch": 44,
       "bearing": -145,
       "text": "",
       "media": [
@@ -440,8 +440,8 @@
         0.2058,
         49.7073
       ],
-      "zoom": 14.7,
-      "pitch": 63,
+      "zoom": 14.2,
+      "pitch": 44,
       "bearing": -125,
       "text": "",
       "media": [
@@ -469,9 +469,9 @@
         2.3499,
         48.853
       ],
-      "zoom": 15.5,
-      "pitch": 64,
-      "bearing": -36,
+      "zoom": 14.9,
+      "pitch": 45,
+      "bearing": -32,
       "media": [
         {
           "type": "image",
@@ -507,9 +507,9 @@
         3.9824,
         45.2836
       ],
-      "zoom": 15.2,
-      "pitch": 63,
-      "bearing": 32,
+      "zoom": 13.9,
+      "pitch": 43,
+      "bearing": 24,
       "text": "et au long de ses pérégrinations en France et en Italie avec \"your French family\"! ( pétanque/ soupe à l'oignon/ Chalencon...);",
       "media": [
         {
@@ -546,9 +546,9 @@
         3.9858,
         45.297
       ],
-      "zoom": 14.6,
-      "pitch": 63,
-      "bearing": -24,
+      "zoom": 13.9,
+      "pitch": 43,
+      "bearing": 4,
       "text": "",
       "media": [
         {
@@ -593,9 +593,9 @@
         4.0088,
         45.2519
       ],
-      "zoom": 14.4,
-      "pitch": 64,
-      "bearing": 68,
+      "zoom": 13.9,
+      "pitch": 43,
+      "bearing": 28,
       "media": [
         {
           "type": "image",
@@ -627,9 +627,9 @@
         4.0096,
         45.2502
       ],
-      "zoom": 14.2,
-      "pitch": 64,
-      "bearing": 28,
+      "zoom": 13.8,
+      "pitch": 43,
+      "bearing": 16,
       "media": [],
       "elevM": 658,
       "elevFt": 2159
@@ -648,8 +648,8 @@
         5.3947,
         43.7371
       ],
-      "zoom": 14.0,
-      "pitch": 64,
+      "zoom": 13.6,
+      "pitch": 44,
       "bearing": 12,
       "media": [
         {
@@ -686,9 +686,9 @@
         5.7118,
         43.1815
       ],
-      "zoom": 14.2,
-      "pitch": 63,
-      "bearing": 148,
+      "zoom": 13.7,
+      "pitch": 44,
+      "bearing": 145,
       "text": "",
       "media": [
         {
@@ -719,9 +719,9 @@
         6.8879,
         45.8793
       ],
-      "zoom": 13.3,
-      "pitch": 62,
-      "bearing": 155,
+      "zoom": 12.2,
+      "pitch": 40,
+      "bearing": 145,
       "text": "",
       "media": [
         {
@@ -752,8 +752,8 @@
         12.3285,
         45.4422
       ],
-      "zoom": 15.4,
-      "pitch": 63,
+      "zoom": 14.8,
+      "pitch": 45,
       "bearing": 128,
       "text": "",
       "media": [
@@ -779,9 +779,9 @@
         11.2508,
         43.7645
       ],
-      "zoom": 15.4,
-      "pitch": 63,
-      "bearing": 142,
+      "zoom": 14.7,
+      "pitch": 45,
+      "bearing": 140,
       "text": "",
       "media": [
         {
@@ -806,9 +806,9 @@
         12.4922,
         41.8902
       ],
-      "zoom": 15.6,
-      "pitch": 63,
-      "bearing": -64,
+      "zoom": 15.0,
+      "pitch": 45,
+      "bearing": -55,
       "text": "",
       "media": [
         {
@@ -835,9 +835,9 @@
         170.8174,
         -42.8992
       ],
-      "zoom": 13.3,
-      "pitch": 63,
-      "bearing": 132,
+      "zoom": 12.8,
+      "pitch": 43,
+      "bearing": 125,
       "media": [
         {
           "type": "image",
@@ -875,8 +875,8 @@
         -159.3189,
         22.0731
       ],
-      "zoom": 13.8,
-      "pitch": 64,
+      "zoom": 13.5,
+      "pitch": 44,
       "bearing": -72,
       "media": [
         {
@@ -903,8 +903,8 @@
         -109.8658,
         38.3885
       ],
-      "zoom": 14.1,
-      "pitch": 64,
+      "zoom": 13.4,
+      "pitch": 43,
       "bearing": 112,
       "media": [
         {
@@ -931,9 +931,9 @@
         -108.0136,
         37.9182
       ],
-      "zoom": 13.4,
-      "pitch": 63,
-      "bearing": 132,
+      "zoom": 12.8,
+      "pitch": 41,
+      "bearing": 128,
       "media": [
         {
           "type": "image",
@@ -971,9 +971,9 @@
         -108.0528,
         38.0753
       ],
-      "zoom": 13.3,
-      "pitch": 63,
-      "bearing": 158,
+      "zoom": 12.7,
+      "pitch": 41,
+      "bearing": 142,
       "media": [
         {
           "type": "image",
@@ -999,9 +999,9 @@
         -107.6707,
         38.0228
       ],
-      "zoom": 13.4,
-      "pitch": 62,
-      "bearing": 172,
+      "zoom": 12.5,
+      "pitch": 39,
+      "bearing": 162,
       "media": [
         {
           "type": "image",
@@ -1031,9 +1031,9 @@
         -107.6815,
         38.0185
       ],
-      "zoom": 13.5,
-      "pitch": 63,
-      "bearing": 162,
+      "zoom": 12.6,
+      "pitch": 40,
+      "bearing": 156,
       "text": "Remember below when we went backpacking and he used his binoculars to look at that girl that flipped him off 😂 Anyway wanted to throw that in the ring!",
       "media": [
         {
@@ -1060,8 +1060,8 @@
         -107.543,
         37.4032
       ],
-      "zoom": 13.4,
-      "pitch": 63,
+      "zoom": 12.8,
+      "pitch": 41,
       "bearing": 12,
       "media": [
         {
@@ -1098,9 +1098,9 @@
         -106.6975,
         37.3506
       ],
-      "zoom": 13.2,
-      "pitch": 63,
-      "bearing": 44,
+      "zoom": 12.5,
+      "pitch": 40,
+      "bearing": 32,
       "text": "backpack trips, elk hunts, hikes, danny without shirt, with cigar, with binos, long ocd conversations about all things.",
       "media": [
         {
@@ -1217,8 +1217,8 @@
         -106.6234,
         37.3385
       ],
-      "zoom": 13.3,
-      "pitch": 63,
+      "zoom": 12.6,
+      "pitch": 40,
       "bearing": 35,
       "media": [
         {
@@ -1257,9 +1257,9 @@
         -106.5427,
         37.3578
       ],
-      "zoom": 13.9,
-      "pitch": 63,
-      "bearing": 24,
+      "zoom": 13.0,
+      "pitch": 41,
+      "bearing": 20,
       "media": [
         {
           "type": "image",
@@ -1285,9 +1285,9 @@
         -106.5328,
         37.352
       ],
-      "zoom": 13.8,
-      "pitch": 63,
-      "bearing": -52,
+      "zoom": 13.0,
+      "pitch": 41,
+      "bearing": -12,
       "media": [],
       "elevM": 3000,
       "elevFt": 9843
@@ -1306,9 +1306,9 @@
         -106.4495,
         37.0466
       ],
-      "zoom": 13.7,
-      "pitch": 63,
-      "bearing": -38,
+      "zoom": 12.9,
+      "pitch": 41,
+      "bearing": -28,
       "media": [
         {
           "type": "image",
@@ -1358,9 +1358,9 @@
         -106.0667,
         39.4802
       ],
-      "zoom": 13.5,
-      "pitch": 63,
-      "bearing": -102,
+      "zoom": 12.7,
+      "pitch": 41,
+      "bearing": -88,
       "media": [
         {
           "type": "image",
@@ -1386,8 +1386,8 @@
         -106.0522,
         39.4765
       ],
-      "zoom": 14.3,
-      "pitch": 63,
+      "zoom": 13.2,
+      "pitch": 42,
       "bearing": -82,
       "media": [],
       "elevM": 2974,
@@ -1407,9 +1407,9 @@
         -106.0465,
         39.4829
       ],
-      "zoom": 14.1,
-      "pitch": 63,
-      "bearing": -96,
+      "zoom": 13.1,
+      "pitch": 42,
+      "bearing": -90,
       "media": [],
       "elevM": 2915,
       "elevFt": 9564
@@ -1428,9 +1428,9 @@
         -105.1783,
         38.7467
       ],
-      "zoom": 13.6,
-      "pitch": 64,
-      "bearing": 48,
+      "zoom": 13.0,
+      "pitch": 42,
+      "bearing": 42,
       "media": [
         {
           "type": "image",
@@ -1456,8 +1456,8 @@
         -104.7565,
         38.886
       ],
-      "zoom": 14.2,
-      "pitch": 64,
+      "zoom": 13.6,
+      "pitch": 44,
       "bearing": -96,
       "media": [],
       "elevM": 1956,
@@ -1477,9 +1477,9 @@
         -104.7626,
         38.9549
       ],
-      "zoom": 13.8,
-      "pitch": 64,
-      "bearing": -104,
+      "zoom": 13.3,
+      "pitch": 44,
+      "bearing": -102,
       "media": [
         {
           "type": "image",
@@ -1505,9 +1505,9 @@
         -104.7563,
         39.0954
       ],
-      "zoom": 14.4,
-      "pitch": 64,
-      "bearing": -102,
+      "zoom": 13.8,
+      "pitch": 44,
+      "bearing": -96,
       "media": [],
       "elevM": 2286,
       "elevFt": 7500
@@ -1526,8 +1526,8 @@
         -104.7549,
         39.0961
       ],
-      "zoom": 14.6,
-      "pitch": 64,
+      "zoom": 13.9,
+      "pitch": 44,
       "bearing": -88,
       "media": [
         {
@@ -1556,8 +1556,8 @@
         -105.0192,
         39.744
       ],
-      "zoom": 15.2,
-      "pitch": 64,
+      "zoom": 14.6,
+      "pitch": 45,
       "bearing": -85,
       "media": [
         {
@@ -1590,9 +1590,9 @@
         -105.22,
         39.6692
       ],
-      "zoom": 14.0,
-      "pitch": 64,
-      "bearing": -48,
+      "zoom": 13.2,
+      "pitch": 43,
+      "bearing": -68,
       "media": [
         {
           "type": "image",
